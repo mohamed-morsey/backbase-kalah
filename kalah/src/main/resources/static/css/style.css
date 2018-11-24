@@ -1,0 +1,16 @@
+.bank-table{
+    width:100%;
+    border-collapse:collapse;
+}
+.bank-table th{
+    padding:5px; background: #BFBFBF; border:#000000 2px solid;
+}
+.bank-table td{
+    padding:5px; border:#000000 2px solid;
+}
+.bank-table tr:nth-child(odd){
+    background: #FFFFFF;
+}
+.bank-table tr:nth-child(even){
+    background: #E9E9E9;
+}

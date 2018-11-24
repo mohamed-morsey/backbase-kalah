@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style type="text/css">
+            .error-table{
+                width:100%;
+                border-collapse:collapse;
+            }
+            .error-table td{
+                vertical-align:top;
+                border:#000000 2px solid;
+                padding:10px;
+            }
+    </style>
+</head>
+<body>
+<h2>Blue Harvest Coding Challenge: Error</h2>
+<table class="error-table">
+    <tr>
+        <td>Date</td>
+        <td th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
+    </tr>
+    <tr>
+        <td>Path</td>
+        <td th:text="${path}"/>
+    </tr>
+    <tr>
+        <td>Error</td>
+        <td th:text="${error}"/>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td th:text="${status}"/>
+    </tr>
+    <tr>
+        <td>Message</td>
+        <td th:text="${message}"/>
+    </tr>
+</table>
+</body>
+</html>
