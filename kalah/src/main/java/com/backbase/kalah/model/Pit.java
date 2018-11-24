@@ -13,6 +13,14 @@ public class Pit {
     private int stoneCount;
     private boolean isKalah;
 
+    public Pit(int index, int nextPitIndex, int oppositePitIndex, int stoneCount, boolean isKalah) {
+        this.index = index;
+        this.nextPitIndex = nextPitIndex;
+        this.oppositePitIndex = oppositePitIndex;
+        this.stoneCount = stoneCount;
+        this.isKalah = isKalah;
+    }
+
     public int getIndex() {
         return index;
     }

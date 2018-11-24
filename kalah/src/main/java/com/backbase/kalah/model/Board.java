@@ -5,32 +5,29 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.backbase.kalah.constant.Constants.COUNT_OF_PITS;
 
 /**
- * Represents a player of the game
+ * Represents a Kalah game board
  *
  * @author Mohamed Morsey
  * Date: 2018-11-24
  **/
 @Entity
-public class Player {
+public class Board {
     private long id;
 
-    @NotBlank
-    private String name;
+    private List<Pit> pits = new ArrayList<>(COUNT_OF_PITS);
 
-    @NotBlank
-    private String email;
-
-    public Player() {
+    public Board() {
         id = 0L;
     }
 
-
-    public Player(long id, String name, String email) {
+    public Board(long id) {
         this.id = id;
-        this.name = name;
-        this.email = email;
     }
 
     @Id
@@ -43,20 +40,12 @@ public class Player {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public List<Pit> getPits() {
+        return pits;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPits(List<Pit> pits) {
+        this.pits = pits;
     }
 
     @Override
@@ -65,13 +54,13 @@ public class Player {
             return true;
         }
 
-        if (!(o instanceof Player)) {
+        if (!(o instanceof Board)) {
             return false;
         }
 
-        Player player = (Player) o;
+        Board board = (Board) o;
 
-        return id == player.id;
+        return id == board.id;
     }
 
     @Override
@@ -81,10 +70,9 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
+        return "Board{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
+                ", pits=" + pits +
                 '}';
     }
 }
