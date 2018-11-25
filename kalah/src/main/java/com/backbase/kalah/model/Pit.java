@@ -25,16 +25,32 @@ public class Pit {
         return index;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     public int getNextPitIndex() {
         return nextPitIndex;
+    }
+
+    public void setNextPitIndex(int nextPitIndex) {
+        this.nextPitIndex = nextPitIndex;
     }
 
     public int getOppositePitIndex() {
         return oppositePitIndex;
     }
 
+    public void setOppositePitIndex(int oppositePitIndex) {
+        this.oppositePitIndex = oppositePitIndex;
+    }
+
     public boolean isKalah() {
         return isKalah;
+    }
+
+    public void setKalah(boolean kalah) {
+        isKalah = kalah;
     }
 
     public int getStoneCount() {

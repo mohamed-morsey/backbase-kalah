@@ -1,14 +1,12 @@
 package com.backbase.kalah.model;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.backbase.kalah.constant.Constants.COUNT_OF_PITS;
+import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 
 /**
  * Represents a Kalah game board
@@ -20,7 +18,7 @@ import static com.backbase.kalah.constant.Constants.COUNT_OF_PITS;
 public class Board {
     private long id;
 
-    private List<Pit> pits = new ArrayList<>(COUNT_OF_PITS);
+    private List<Pit> pits;
 
     public Board() {
         id = 0L;
@@ -28,6 +26,12 @@ public class Board {
 
     public Board(long id) {
         this.id = id;
+        this.pits = new ArrayList<>(COUNT_OF_ALL_PITS);
+    }
+
+    public Board(long id, List<Pit> pits) {
+        this.id = id;
+        this.pits = pits;
     }
 
     @Id

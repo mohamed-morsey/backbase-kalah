@@ -8,7 +8,10 @@ package com.backbase.kalah.constant;
  **/
 public final class Constants {
 
-    public static final int COUNT_OF_PITS = 14;
+    public static final int COUNT_OF_ALL_PITS = 14;
+    public static final int COUNT_PLAYER_PITS = 7;
+
+    public static final int INITIAL_STONE_COUNT = 6;
 
     private Constants() {
         // Private constructor to prevent instantiation
