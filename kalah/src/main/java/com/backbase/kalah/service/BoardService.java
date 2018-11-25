@@ -1,9 +1,11 @@
 package com.backbase.kalah.service;
 
+import com.backbase.kalah.constant.Constants;
 import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.model.Pit;
 import com.backbase.kalah.repository.BoardRepository;
+import com.backbase.kalah.repository.GameRepository;
 import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 import static com.backbase.kalah.constant.Constants.COUNT_PLAYER_PITS;
@@ -18,23 +21,64 @@ import static com.backbase.kalah.constant.Constants.INITIAL_STONE_COUNT;
 import static com.backbase.kalah.constant.Messages.NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE;
 
 /**
- * A service for handling Kalah game
+ * A service for managing kalah {@link Board}s
  *
  * @author Mohamed Morsey
  * Date: 2018-11-24
  **/
 @Service
-public class KalahGameService {
+public class BoardService implements CrudService<Board> {
     private Logger logger;
     private BoardRepository boardRepository;
 
     @Inject
-    public KalahGameService(BoardRepository boardRepository, Logger logger) {
+    public BoardService(BoardRepository boardRepository, Logger logger) {
         this.boardRepository = boardRepository;
         this.logger = logger;
     }
 
-    public Game createNewGame(){
+    @Override
+    public Optional<Board> get(long id) {
+        return Optional.of(boardRepository.findOne(id));
+    }
+
+    @Override
+    public List<Board> getAll() {
+        return boardRepository.findAll();
+    }
+
+    @Override
+    public Board create(Board item) {
+        return boardRepository.save(item);
+    }
+
+    @Override
+    public boolean update(Board item) {
+        long id = item.getId();
+
+        if(!boardRepository.exists(id)) {
+            return false;
+        }
+
+        boardRepository.save(item);
+        return true;
+    }
+
+    @Override
+    public boolean delete(long id) {
+        if(!boardRepository.exists(id)) {
+            return false;
+        }
+
+        boardRepository.delete(id);
+        return true;
+    }
+
+    /**
+     * Creates a new initialized {@link Board}
+     * @return The newly created board
+     */
+    public Board createInitializedBoard(){
         Board board = new Board();
 
         List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
@@ -47,11 +91,17 @@ public class KalahGameService {
 
         logger.info(NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE);
 
-        boardRepository.save(board);
-
-        return new Game();
+        return create(board);
     }
 
+    /**
+     * Initialize the pits of a player
+     * @param board The board to which the pits belong
+     * @param startPitIndex The start index of the player pits
+     * @param endPitIndex The end index of the player pits
+     * @param oppositePitStartIndex The start index of the opposite pits (each pit should also keep track of its opposite pit)
+     * @return A list of the pits of a player initialized with {@link Constants#INITIAL_STONE_COUNT}
+     */
     private List<Pit> initPlayerPits(Board board, int startPitIndex, int endPitIndex, int oppositePitStartIndex){
         List<Pit> playerPits = new ArrayList<>();
 
@@ -76,5 +126,4 @@ public class KalahGameService {
 
         return playerPits;
     }
-
 }
