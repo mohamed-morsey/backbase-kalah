@@ -8,7 +8,11 @@ package com.backbase.kalah.constant;
  **/
 public final class Messages {
 
-    //region generic error messages
+    //region generic messages
+    public static final String PLAY_AGAIN_MESSAGE = "Play again";
+    //endregion
+
+    //region generic success and error messages
     public static final String INVALID_ID_ERROR = "Invalid ID";
     public static final String INVALID_PARAMETER_ERROR = "Invalid parameter value";
     public static final String ITEM_NOT_FOUND_ERROR = "Item not found";
@@ -16,17 +20,18 @@ public final class Messages {
     public static final String OPERATION_FAILURE_ERROR = "Operation failed";
     //endregion
 
-    //region game-related error messages
+    //region game-related success and error messages
     public static final String GAME_NOT_FOUND_ERROR = "Game not found";
     public static final String GAME_CREATION_FAILED_ERROR = "Failed to create a new game";
     //endregion
 
-    //region board-related error messages
+    //region board-related success and error messages
     public static final String BOARD_NOT_FOUND_ERROR = "Board not found";
     public static final String INVALID_PIT_ID_ERROR = "Invalid pit ID";
     public static final String NOT_PLAYER_TURN_ERROR = "This is not that player's turn";
     public static final String GAME_FINISHED_ERROR = "Game is finished already";
     public static final String KALAH_MOVE_ERROR = "Playing from a Kalah is not allowed";
+    public static final String PIT_EMPTY_ERROR = "Pit is empty already";
     //endregion
 
     //region logging messages

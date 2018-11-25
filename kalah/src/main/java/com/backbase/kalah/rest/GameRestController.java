@@ -96,7 +96,8 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        boardService.makeMove(idLong, pitIdLong);
+        // pitId - 1 as it should be zero based but in the interface is it's one based
+        boardService.makeMove(idLong, pitIdLong - 1);
 
         return ResponseEntity.ok().build();
     }
