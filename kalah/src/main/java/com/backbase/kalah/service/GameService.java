@@ -57,7 +57,7 @@ public class GameService implements CrudService<Game> {
     public boolean update(Game item) {
         long id = item.getId();
 
-        if (!gameRepository.exists(id)) {
+        if (!exists(id)) {
             logger.warn(ITEM_NOT_FOUND_ERROR);
             return false;
         }
@@ -68,12 +68,16 @@ public class GameService implements CrudService<Game> {
 
     @Override
     public boolean delete(long id) {
-        if (!gameRepository.exists(id)) {
+        if (!exists(id)) {
             logger.warn(ITEM_NOT_FOUND_ERROR);
             return false;
         }
 
         gameRepository.delete(id);
         return true;
+    }
+
+    public boolean exists(long id){
+        return gameRepository.exists(id);
     }
 }

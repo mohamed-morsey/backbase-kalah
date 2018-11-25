@@ -17,8 +17,16 @@ public final class Messages {
     //endregion
 
     //region game-related error messages
-    public static final String GAME_NULL_ERROR = "Game cannot be null";
+    public static final String GAME_NOT_FOUND_ERROR = "Game not found";
     public static final String GAME_CREATION_FAILED_ERROR = "Failed to create a new game";
+    //endregion
+
+    //region board-related error messages
+    public static final String BOARD_NOT_FOUND_ERROR = "Board not found";
+    public static final String INVALID_PIT_ID_ERROR = "Invalid pit ID";
+    public static final String NOT_PLAYER_TURN_ERROR = "This is not that player's turn";
+    public static final String GAME_FINISHED_ERROR = "Game is finished already";
+    public static final String KALAH_MOVE_ERROR = "Playing from a Kalah is not allowed";
     //endregion
 
     //region logging messages

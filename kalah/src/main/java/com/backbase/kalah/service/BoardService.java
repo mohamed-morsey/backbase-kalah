@@ -1,9 +1,10 @@
 package com.backbase.kalah.service;
 
 import com.backbase.kalah.constant.Constants;
+import com.backbase.kalah.error.KalahPlayException;
 import com.backbase.kalah.model.Board;
-import com.backbase.kalah.model.Game;
 import com.backbase.kalah.model.Pit;
+import com.backbase.kalah.model.PlayerTurn;
 import com.backbase.kalah.repository.BoardRepository;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -18,9 +19,16 @@ import java.util.Optional;
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 import static com.backbase.kalah.constant.Constants.COUNT_PLAYER_PITS;
 import static com.backbase.kalah.constant.Constants.INITIAL_STONE_COUNT;
-import static com.backbase.kalah.constant.Messages.GAME_NULL_ERROR;
+import static com.backbase.kalah.constant.Messages.BOARD_NOT_FOUND_ERROR;
+import static com.backbase.kalah.constant.Messages.GAME_FINISHED_ERROR;
+import static com.backbase.kalah.constant.Messages.INVALID_PIT_ID_ERROR;
 import static com.backbase.kalah.constant.Messages.ITEM_NOT_FOUND_ERROR;
+import static com.backbase.kalah.constant.Messages.KALAH_MOVE_ERROR;
 import static com.backbase.kalah.constant.Messages.NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE;
+import static com.backbase.kalah.constant.Messages.NOT_PLAYER_TURN_ERROR;
+import static com.backbase.kalah.model.PlayerTurn.FIRST_PLAYER;
+import static com.backbase.kalah.model.PlayerTurn.SECOND_PLAYER;
+import static com.backbase.kalah.model.Status.RUNNING;
 
 /**
  * A service for managing kalah {@link Board}s
@@ -93,10 +101,64 @@ public class BoardService implements CrudService<Board> {
         allPits.addAll(player2Pits);
 
         board.setPits(ImmutableList.copyOf(allPits));
-
         logger.info(NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE);
 
         return create(board);
+    }
+
+    /**
+     * Makes a move on the given board
+     *
+     * @param id    The ID of the board
+     * @param pitId The ID of the pit to be used for making the move
+     * @return The status of the board after making move if successful, {@link Optional#EMPTY} otherwise
+     */
+    public Optional<Board> makeMove(long id, int pitId) {
+        Preconditions.checkArgument(pitId >=0 && pitId < COUNT_OF_ALL_PITS, INVALID_PIT_ID_ERROR);
+
+        Optional<Board> boardOptional = get(id);
+        if (!boardOptional.isPresent()) {
+            logger.warn(BOARD_NOT_FOUND_ERROR);
+            return Optional.empty();
+        }
+
+        Board board = boardOptional.get();
+
+        // check if the game is still running
+        if(board.getStatus() != RUNNING){
+            logger.error(GAME_FINISHED_ERROR);
+            throw new KalahPlayException(GAME_FINISHED_ERROR);
+        }
+
+        // Check if the player wants to play from a Kalah
+        if(isKalah(pitId)){
+            logger.error(KALAH_MOVE_ERROR);
+            throw new KalahPlayException(KALAH_MOVE_ERROR);
+        }
+
+        // Check if it is the player's turn
+        if(!isPlayerTurn(board, pitId)){
+            logger.error(NOT_PLAYER_TURN_ERROR);
+            throw new KalahPlayException(NOT_PLAYER_TURN_ERROR);
+        }
+
+        Pit desiredPit = board.getPits().get(pitId);
+        int stones = desiredPit.getStoneCount();
+        desiredPit.setStoneCount(0); // Set stone count to 0 as we should empty the desired pit
+
+        Pit currentPit = board.getPits().get(desiredPit.getNextPitIndex());
+        for(int i = 0; i < stones; i++){
+            currentPit.incrementStones();
+            currentPit = board.getPits().get(currentPit.getNextPitIndex());
+        }
+
+        // Switch player turn
+        PlayerTurn nextPlayerTurn = board.getPlayerTurn() == FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER;
+        board.setPlayerTurn(nextPlayerTurn);
+
+        boardRepository.save(board);
+
+        return Optional.empty();
     }
 
     /**
@@ -131,5 +193,34 @@ public class BoardService implements CrudService<Board> {
         playerPits.add(kalahPit);
 
         return playerPits;
+    }
+
+    /**
+     * Checks if the pits is a Kalah (house)
+     * @param pitId The ID of the pit
+     * @return True if the pit is a Kalah, false otherwise
+     */
+    private boolean isKalah(int pitId) {
+        return (pitId == COUNT_PLAYER_PITS - 1) || (pitId == COUNT_OF_ALL_PITS - 1);
+    }
+
+    /**
+     * Checks if the desired pit is allowed for the current player
+     * @param board The board
+     * @param pitId The ID of the pit
+     * @return True if it's player's turn, false otherwise
+     */
+    private boolean isPlayerTurn(Board board, int pitId) {
+        // In case of first player the allowed pits are between 0 and 5
+        if((board.getPlayerTurn() == FIRST_PLAYER) && (pitId >= 0 && pitId < COUNT_PLAYER_PITS - 1)){
+            return true;
+        }
+
+        // In case of first player the allowed pits are between 7 and 12
+        if((board.getPlayerTurn() == SECOND_PLAYER) && (pitId >= COUNT_PLAYER_PITS && pitId < COUNT_OF_ALL_PITS - 1)){
+            return true;
+        }
+
+        return false;
     }
 }

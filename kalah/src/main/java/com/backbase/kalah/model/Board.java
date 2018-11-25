@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
+import static com.backbase.kalah.model.PlayerTurn.FIRST_PLAYER;
+import static com.backbase.kalah.model.Status.RUNNING;
 
 /**
  * Represents a Kalah game board
@@ -22,19 +24,18 @@ import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 @Entity
 public class Board {
     private long id;
+    private PlayerTurn playerTurn;
+    private Status status;
     private List<Pit> pits;
 
     public Board() {
         id = 0L;
+        playerTurn = FIRST_PLAYER;
+        status = RUNNING;
     }
 
-    public Board(long id) {
-        this.id = id;
-        this.pits = new ArrayList<>(COUNT_OF_ALL_PITS);
-    }
-
-    public Board(long id, List<Pit> pits) {
-        this.id = id;
+    public Board(List<Pit> pits) {
+        this();
         this.pits = pits;
     }
 
@@ -46,6 +47,22 @@ public class Board {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public PlayerTurn getPlayerTurn() {
+        return playerTurn;
+    }
+
+    public void setPlayerTurn(PlayerTurn playerTurn) {
+        this.playerTurn = playerTurn;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
@@ -81,6 +98,8 @@ public class Board {
     public String toString() {
         return "Board{" +
                 "id=" + id +
+                ", playerTurn=" + playerTurn +
+                ", status=" + status +
                 ", pits=" + pits +
                 '}';
     }

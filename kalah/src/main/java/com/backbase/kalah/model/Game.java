@@ -20,19 +20,16 @@ public class Game {
     private Board board;
     private long player1Id;
     private long player2Id;
-    private Status status;
 
     public Game() {
         id = 0L;
-        status = RUNNING;
     }
 
-    public Game(long id, Board board, long player1Id, long player2Id) {
-        this.id = id;
+    public Game(Board board, long player1Id, long player2Id) {
+        this();
         this.board = board;
         this.player1Id = player1Id;
         this.player2Id = player2Id;
-        this.status = RUNNING;
     }
 
     @Id
@@ -70,11 +67,33 @@ public class Game {
         this.player2Id = player2Id;
     }
 
-    public Status getStatus() {
-        return status;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Game)) {
+            return false;
+        }
+
+        Game game = (Game) o;
+
+        return id == game.id;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", board=" + board +
+                ", player1Id=" + player1Id +
+                ", player2Id=" + player2Id +
+                '}';
     }
 }

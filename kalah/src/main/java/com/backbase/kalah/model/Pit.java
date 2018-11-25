@@ -24,8 +24,12 @@ public class Pit {
 
     private Board board;
 
-    public Pit(int index, int nextPitIndex, int oppositePitIndex, int stoneCount, boolean isKalah) {
+    public Pit(){
         this.id = 0L;
+    }
+
+    public Pit(int index, int nextPitIndex, int oppositePitIndex, int stoneCount, boolean isKalah) {
+        this();
         this.index = index;
         this.nextPitIndex = nextPitIndex;
         this.oppositePitIndex = oppositePitIndex;
@@ -81,6 +85,11 @@ public class Pit {
 
     public void setStoneCount(int stoneCount) {
         this.stoneCount = stoneCount;
+    }
+
+    // Increments the number of stones by one
+    public int incrementStones(){
+        return ++stoneCount;
     }
 
     @ManyToOne
