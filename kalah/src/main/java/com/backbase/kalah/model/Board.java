@@ -4,7 +4,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +22,6 @@ import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 @Entity
 public class Board {
     private long id;
-
     private List<Pit> pits;
 
     public Board() {

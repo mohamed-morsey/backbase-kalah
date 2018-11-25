@@ -5,7 +5,7 @@ import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.model.Pit;
 import com.backbase.kalah.repository.BoardRepository;
-import com.backbase.kalah.repository.GameRepository;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,9 @@ import java.util.Optional;
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 import static com.backbase.kalah.constant.Constants.COUNT_PLAYER_PITS;
 import static com.backbase.kalah.constant.Constants.INITIAL_STONE_COUNT;
-import static com.backbase.kalah.constant.Messages.NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE;
+import static com.backbase.kalah.constant.Messages.GAME_NULL_ERROR;
+import static com.backbase.kalah.constant.Messages.ITEM_NOT_FOUND_ERROR;
+import static com.backbase.kalah.constant.Messages.NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE;
 
 /**
  * A service for managing kalah {@link Board}s
@@ -44,7 +46,7 @@ public class BoardService implements CrudService<Board> {
 
     @Override
     public List<Board> getAll() {
-        return boardRepository.findAll();
+        return ImmutableList.copyOf(boardRepository.findAll());
     }
 
     @Override
@@ -56,7 +58,8 @@ public class BoardService implements CrudService<Board> {
     public boolean update(Board item) {
         long id = item.getId();
 
-        if(!boardRepository.exists(id)) {
+        if (!boardRepository.exists(id)) {
+            logger.warn(ITEM_NOT_FOUND_ERROR);
             return false;
         }
 
@@ -66,7 +69,8 @@ public class BoardService implements CrudService<Board> {
 
     @Override
     public boolean delete(long id) {
-        if(!boardRepository.exists(id)) {
+        if (!boardRepository.exists(id)) {
+            logger.warn(ITEM_NOT_FOUND_ERROR);
             return false;
         }
 
@@ -76,9 +80,10 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Creates a new initialized {@link Board}
+     *
      * @return The newly created board
      */
-    public Board createInitializedBoard(){
+    public Board createInitializedBoard() {
         Board board = new Board();
 
         List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
@@ -89,26 +94,27 @@ public class BoardService implements CrudService<Board> {
 
         board.setPits(ImmutableList.copyOf(allPits));
 
-        logger.info(NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE);
+        logger.info(NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE);
 
         return create(board);
     }
 
     /**
      * Initialize the pits of a player
-     * @param board The board to which the pits belong
-     * @param startPitIndex The start index of the player pits
-     * @param endPitIndex The end index of the player pits
+     *
+     * @param board                 The board to which the pits belong
+     * @param startPitIndex         The start index of the player pits
+     * @param endPitIndex           The end index of the player pits
      * @param oppositePitStartIndex The start index of the opposite pits (each pit should also keep track of its opposite pit)
      * @return A list of the pits of a player initialized with {@link Constants#INITIAL_STONE_COUNT}
      */
-    private List<Pit> initPlayerPits(Board board, int startPitIndex, int endPitIndex, int oppositePitStartIndex){
+    private List<Pit> initPlayerPits(Board board, int startPitIndex, int endPitIndex, int oppositePitStartIndex) {
         List<Pit> playerPits = new ArrayList<>();
 
         int oppositePitIndex = oppositePitStartIndex; // The index of the opposite pit
 
         // Initialize all pits except Kalah
-        for (int i = startPitIndex; i < endPitIndex; i++){
+        for (int i = startPitIndex; i < endPitIndex; i++) {
             Pit currentPit = new Pit(i, i + 1, oppositePitIndex, INITIAL_STONE_COUNT, false);
             currentPit.setBoard(board);
             playerPits.add(currentPit);
@@ -117,7 +123,7 @@ public class BoardService implements CrudService<Board> {
         }
 
         // If the kalah of the player is ranked as 6 then the opposite one is ranked 0 and vice versa
-        int oppositeKalahIndex = (endPitIndex == COUNT_PLAYER_PITS - 1) ? COUNT_OF_ALL_PITS -1 : COUNT_PLAYER_PITS - 1;
+        int oppositeKalahIndex = (endPitIndex == COUNT_PLAYER_PITS - 1) ? COUNT_OF_ALL_PITS - 1 : COUNT_PLAYER_PITS - 1;
 
         // Initialize the Kalah
         Pit kalahPit = new Pit(endPitIndex, (endPitIndex + 1) % COUNT_OF_ALL_PITS, oppositeKalahIndex, 0, true);

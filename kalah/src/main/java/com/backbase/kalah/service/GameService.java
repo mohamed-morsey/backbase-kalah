@@ -1,82 +1,79 @@
 package com.backbase.kalah.service;
 
-import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
-import com.backbase.kalah.model.Pit;
-import com.backbase.kalah.repository.BoardRepository;
 import com.backbase.kalah.repository.GameRepository;
 import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
-import static com.backbase.kalah.constant.Constants.COUNT_PLAYER_PITS;
-import static com.backbase.kalah.constant.Constants.INITIAL_STONE_COUNT;
-import static com.backbase.kalah.constant.Messages.NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE;
+import static com.backbase.kalah.constant.Messages.ITEM_NOT_FOUND_ERROR;
 
 /**
- * A service for handling Kalah game
+ * A service for managing Kalah {@link Game}s
  *
  * @author Mohamed Morsey
  * Date: 2018-11-24
  **/
 @Service
-public class GameService {
+public class GameService implements CrudService<Game> {
     private Logger logger;
     private GameRepository gameRepository;
-    private BoardRepository boardRepository;
+    private BoardService boardService;
 
     @Inject
-    public GameService(GameRepository gameRepository, BoardRepository boardRepository, Logger logger) {
-        this.boardRepository = boardRepository;
+    public GameService(GameRepository gameRepository, BoardService boardService, Logger logger) {
+        this.gameRepository = gameRepository;
+        this.boardService = boardService;
         this.logger = logger;
     }
 
-    public Game createNewGame(){
-        Board board = new Board();
+    public Optional<Game> createNewGame() {
+        Game newGame = new Game();
+        newGame.setBoard(boardService.createInitializedBoard());
 
-        List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
-        List<Pit> player2Pits = initPlayerPits(board, COUNT_PLAYER_PITS, COUNT_OF_ALL_PITS - 1, COUNT_PLAYER_PITS - 2);
-
-        List<Pit> allPits = new ArrayList<>(player1Pits);
-        allPits.addAll(player2Pits);
-
-        board.setPits(ImmutableList.copyOf(allPits));
-
-        logger.info(NEW_GAME_INITIALIZED_SUCCESSFULLY_MESSAGE);
-
-        boardRepository.save(board);
-
-        return new Game();
+        return Optional.of(gameRepository.save(newGame));
     }
 
-    private List<Pit> initPlayerPits(Board board, int startPitIndex, int endPitIndex, int oppositePitStartIndex){
-        List<Pit> playerPits = new ArrayList<>();
+    @Override
+    public Optional<Game> get(long id) {
+        return Optional.of(gameRepository.findOne(id));
+    }
 
-        int oppositePitIndex = oppositePitStartIndex; // The index of the opposite pit
+    @Override
+    public List<Game> getAll() {
+        return ImmutableList.copyOf(gameRepository.findAll());
+    }
 
-        // Initialize all pits except Kalah
-        for (int i = startPitIndex; i < endPitIndex; i++){
-            Pit currentPit = new Pit(i, i + 1, oppositePitIndex, INITIAL_STONE_COUNT, false);
-            currentPit.setBoard(board);
-            playerPits.add(currentPit);
+    @Override
+    public Game create(Game item) {
+        return gameRepository.save(item);
+    }
 
-            oppositePitIndex--;
+    @Override
+    public boolean update(Game item) {
+        long id = item.getId();
+
+        if (!gameRepository.exists(id)) {
+            logger.warn(ITEM_NOT_FOUND_ERROR);
+            return false;
         }
 
-        // If the kalah of the player is ranked as 6 then the opposite one is ranked 0 and vice versa
-        int oppositeKalahIndex = (endPitIndex == COUNT_PLAYER_PITS - 1) ? COUNT_OF_ALL_PITS -1 : COUNT_PLAYER_PITS - 1;
-
-        // Initialize the Kalah
-        Pit kalahPit = new Pit(endPitIndex, (endPitIndex + 1) % COUNT_OF_ALL_PITS, oppositeKalahIndex, 0, true);
-        kalahPit.setBoard(board);
-        playerPits.add(kalahPit);
-
-        return playerPits;
+        gameRepository.save(item);
+        return true;
     }
 
+    @Override
+    public boolean delete(long id) {
+        if (!gameRepository.exists(id)) {
+            logger.warn(ITEM_NOT_FOUND_ERROR);
+            return false;
+        }
+
+        gameRepository.delete(id);
+        return true;
+    }
 }
