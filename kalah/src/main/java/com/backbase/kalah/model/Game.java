@@ -1,8 +1,11 @@
 package com.backbase.kalah.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 /**
  * Represents a Kalah game
@@ -17,6 +20,7 @@ public class Game {
     private Board board;
 
     private long player1Id;
+
     private long player2Id;
 
     public Game() {
@@ -40,8 +44,13 @@ public class Game {
         this.id = id;
     }
 
+    @OneToOne(cascade = CascadeType.ALL)
     public Board getBoard() {
         return board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     public long getPlayer1Id() {
