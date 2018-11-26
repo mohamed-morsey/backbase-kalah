@@ -165,33 +165,33 @@ public class BoardService implements CrudService<Board> {
         int stones = pit.getStoneCount();
         pit.setStoneCount(0); // Set stone count to 0 as we should empty the desired pit
 
+        PlayerTurn playerTurn = board.getPlayerTurn();
         Pit lastVisitedPit = pit; // represents the last pit that received a stone
         Pit nextPit = board.getPits().get(pit.getNextPitIndex());
 
         for (int i = 0; i < stones; i++) {
-            nextPit.incrementStones();
+            // If it is not my own Kalah, then I should not drop a stone into it
+            if(!isOpponentKalah(playerTurn, nextPit)) {
+                nextPit.incrementStones();
+            }
+
             lastVisitedPit = nextPit;
             nextPit = board.getPits().get(nextPit.getNextPitIndex());
         }
 
-        // If the last one is placed into Kalah, then we should not switch players, and no furthe actions are required
-        if(lastVisitedPit.isKalah()){
+        // If the last one is placed into my Kalah, then we should not switch players, and no further actions are required
+        if (isMyKalah(playerTurn, lastVisitedPit)) {
             return boardRepository.save(board);
         }
 
-        // If the last one is placed into Kalah, then we SHOULD NOT SWITCH PLAYERS
-        boolean switchPlayer = !lastVisitedPit.isKalah();
-
-        // Switch player turn and save board, no further actions are required
-        if (switchPlayer) {
-            PlayerTurn nextPlayerTurn = board.getPlayerTurn() == FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER;
-            board.setPlayerTurn(nextPlayerTurn);
-        }
+        // Switch player turn
+        PlayerTurn nextPlayerTurn = playerTurn == FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER;
+        board.setPlayerTurn(nextPlayerTurn);
 
         // If the last placed stone is dropped into an empty pit, then we should collect all opposite pit stones if not zero
-        if(lastVisitedPit.getStoneCount() == 1){
+        if (lastVisitedPit.getStoneCount() == 1) {
             Pit oppositePit = board.getPits().get(lastVisitedPit.getOppositePitIndex());
-            if(oppositePit.getStoneCount() != 0){
+            if (oppositePit.getStoneCount() != 0) {
                 int totalStones = lastVisitedPit.getStoneCount() + oppositePit.getStoneCount();
 
                 // clear stones in both pits and move them to the right Kalah
@@ -204,6 +204,46 @@ public class BoardService implements CrudService<Board> {
         }
 
         return boardRepository.save(board);
+    }
+
+    /**
+     * Checks if the pit is current player's Kalah
+     * @param currentTurn The player turn
+     * @param pitToCheck The {@link Pit} to be checked
+     * @return True if the it's the player's Kalah, false otherwise
+     */
+    private boolean isMyKalah(PlayerTurn currentTurn, Pit pitToCheck) {
+        // First player's Kalah is index at 6
+        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == COUNT_PLAYER_PITS - 1)) {
+            return true;
+        }
+
+        // Second player's Kalah is index at 13
+        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_ALL_PITS - 1)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the pit is opponent player's Kalah
+     * @param currentTurn The player turn
+     * @param pitToCheck The {@link Pit} to be checked
+     * @return True if the it's the opponent player's Kalah, false otherwise
+     */
+    private boolean isOpponentKalah(PlayerTurn currentTurn, Pit pitToCheck) {
+        // First player's Kalah is index at 6
+        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_ALL_PITS - 1)) {
+            return true;
+        }
+
+        // Second player's Kalah is index at 13
+        if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() == COUNT_PLAYER_PITS - 1)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
