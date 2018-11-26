@@ -1,4 +1,4 @@
-package com.backbase.kalah.model;
+package com.backbase.kalah.model.enums;
 
 /**
  * Game allowed statuses

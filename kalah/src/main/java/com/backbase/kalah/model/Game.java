@@ -6,8 +6,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import static com.backbase.kalah.model.Status.RUNNING;
-
 /**
  * Represents a Kalah game
  *

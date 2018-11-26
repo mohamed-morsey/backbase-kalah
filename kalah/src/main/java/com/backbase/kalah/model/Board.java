@@ -1,19 +1,17 @@
 package com.backbase.kalah.model;
 
+import com.backbase.kalah.model.enums.PlayerTurn;
+import com.backbase.kalah.model.enums.Status;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
-import static com.backbase.kalah.model.PlayerTurn.FIRST_PLAYER;
-import static com.backbase.kalah.model.Status.RUNNING;
+import static com.backbase.kalah.model.enums.PlayerTurn.FIRST_PLAYER;
+import static com.backbase.kalah.model.enums.Status.RUNNING;
 
 /**
  * Represents a Kalah game board

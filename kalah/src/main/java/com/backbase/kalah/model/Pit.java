@@ -88,8 +88,9 @@ public class Pit {
     }
 
     // Increments the number of stones by one
-    public int incrementStones(){
-        return ++stoneCount;
+    public int incrementStones(int stonesToAdd){
+        stoneCount+=stonesToAdd;
+        return stoneCount;
     }
 
     @ManyToOne
