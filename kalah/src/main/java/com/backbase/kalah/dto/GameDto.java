@@ -1,18 +1,18 @@
-package com.backbase.kalah.view;
+package com.backbase.kalah.dto;
 
 import com.backbase.kalah.model.Game;
 
 /**
- * View object for {@link Game}
+ * View object for {@link Game} that represents a just-created game
  *
  * @author Mohamed Morsey
  * Date: 2018-11-25
  **/
-public class GameView {
+public class GameDto {
     private long id;
     private String uri;
 
-    public GameView(long id, String uri) {
+    public GameDto(long id, String uri) {
         this.id = id;
         this.uri = uri;
     }
@@ -35,7 +35,7 @@ public class GameView {
 
     @Override
     public String toString() {
-        return "GameView{" +
+        return "GameDto{" +
                 "id=" + id +
                 ", uri='" + uri + '\'' +
                 '}';

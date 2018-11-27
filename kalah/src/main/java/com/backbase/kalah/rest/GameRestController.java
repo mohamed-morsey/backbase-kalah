@@ -1,9 +1,10 @@
 package com.backbase.kalah.rest;
 
+import com.backbase.kalah.dto.GameDto;
+import com.backbase.kalah.dto.GameStatusDto;
+import com.backbase.kalah.utils.GameStatusDtoConverter;
 import com.backbase.kalah.model.Game;
-import com.backbase.kalah.service.BoardService;
 import com.backbase.kalah.service.GameService;
-import com.backbase.kalah.view.GameView;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -39,19 +40,17 @@ import static com.backbase.kalah.constant.Paths.PITS_CONTEXT_PATH;
 @RequestMapping("/" + GAMES_CONTEXT_PATH)
 public class GameRestController {
     private GameService gameService;
-    private BoardService boardService;
     private Logger logger;
 
     @Inject
-    public GameRestController(GameService gameService, Logger logger, BoardService boardService) {
+    public GameRestController(GameService gameService, Logger logger) {
         this.gameService = gameService;
         this.logger = logger;
-        this.boardService = boardService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GameView> createGame() {
+    public ResponseEntity<GameDto> createGame() {
         Optional<Game> gameOptional = gameService.createNewGame();
 
         if (!gameOptional.isPresent()) {
@@ -65,10 +64,12 @@ public class GameRestController {
                 .path("/{id}")
                 .buildAndExpand(gameOptional.get().getId())
                 .toUri();
+        newGame.setUri(location.toString());
+        gameService.update(newGame); // Update the new game with the correct URI
 
-        GameView view = new GameView(newGame.getId(), location.toString());
+        GameDto gameDto = new GameDto(newGame.getId(), newGame.getUri());
 
-        return ResponseEntity.created(location).body(view);
+        return ResponseEntity.created(location).body(gameDto);
     }
 
     @PutMapping(path = "/{id}/" + PITS_CONTEXT_PATH + "/{pitId}",
@@ -91,15 +92,18 @@ public class GameRestController {
         long idLong = Long.parseLong(id);
         int pitIdLong = Integer.parseInt(pitId);
 
-        if (!gameService.exists(idLong)) {
+        // pitId - 1 as it should be zero based but in the interface is it's one based
+        Optional<Game> gameOptional = gameService.makeMove(idLong, pitIdLong - 1);
+
+        // In case the game is not found in the system gameOptional will be Optional#EMPTY
+        if(!gameOptional.isPresent()){
             logger.warn(GAME_NOT_FOUND_ERROR);
             return ResponseEntity.notFound().build();
         }
 
-        // pitId - 1 as it should be zero based but in the interface is it's one based
-        boardService.makeMove(idLong, pitIdLong - 1);
+        GameStatusDto dto = GameStatusDtoConverter.toGameStatusDto(gameOptional.get());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(dto);
     }
 
 }

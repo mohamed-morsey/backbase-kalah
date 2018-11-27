@@ -104,7 +104,7 @@ public class BoardService implements CrudService<Board> {
         List<Pit> allPits = new ArrayList<>(player1Pits);
         allPits.addAll(player2Pits);
 
-        board.setPits(ImmutableList.copyOf(allPits));
+        board.setPits(allPits);
         logger.info(NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE);
 
         return create(board);
@@ -173,7 +173,7 @@ public class BoardService implements CrudService<Board> {
 
         for (int i = 0; i < stones; i++) {
             // If it is not my own Kalah, then I should not drop a stone into it
-            if(!isOpponentKalah(playerTurn, nextPit)) {
+            if (!isOpponentKalah(playerTurn, nextPit)) {
                 nextPit.incrementStones(1);
             }
 
@@ -208,7 +208,7 @@ public class BoardService implements CrudService<Board> {
         }
 
         boolean isFinished = isGameFinished(board);
-        if(isFinished) {
+        if (isFinished) {
             board.setStatus(FINISHED);
             collectAllRemainingStones(board);
             GameResult winner = getWinningPlayer(board);
@@ -219,6 +219,7 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Gets the winner of the game
+     *
      * @param board The board
      * @return {@link PlayerTurn#FIRST_PLAYER} if first player is the winner, {@link PlayerTurn#SECOND_PLAYER} otherwise
      */
@@ -226,9 +227,9 @@ public class BoardService implements CrudService<Board> {
         Pit player1Kalah = getMyKalah(board, FIRST_PLAYER);
         Pit player2Kalah = getMyKalah(board, SECOND_PLAYER);
 
-        if(player1Kalah.getStoneCount() > player2Kalah.getStoneCount()){
+        if (player1Kalah.getStoneCount() > player2Kalah.getStoneCount()) {
             return GameResult.FIRST_PLAYER;
-        } else if (player2Kalah.getStoneCount() > player1Kalah.getStoneCount()){
+        } else if (player1Kalah.getStoneCount() < player2Kalah.getStoneCount()) {
             return GameResult.SECOND_PLAYER;
         }
 
@@ -238,12 +239,13 @@ public class BoardService implements CrudService<Board> {
     /**
      * If a game is finished, i.e. when a player has no more stones in any of her pits, then we should collect all stones
      * of the opponent and drop them into her Kalah
+     *
      * @param board The board to be used for collecting stones
      */
     private void collectAllRemainingStones(Board board) {
         // Collect all stones in all pits of player1
         int player1RemainingStones = 0;
-        for(int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++){
+        for (int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++) {
             player1RemainingStones += board.getPits().get(i).getStoneCount();
             board.getPits().get(i).setStoneCount(0);
         }
@@ -253,7 +255,7 @@ public class BoardService implements CrudService<Board> {
 
         // Collect all stones in all pits of player2
         int player2RemainingStones = 0;
-        for(int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++){
+        for (int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++) {
             player2RemainingStones += board.getPits().get(i).getStoneCount();
             board.getPits().get(i).setStoneCount(0);
         }
@@ -264,19 +266,20 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Checks if the game has come to an end, i.e. when a player has no more stones in any of her pits
+     *
      * @param board The board to be checked
      * @return True if the game is finished, false otherwise
      */
     private boolean isGameFinished(Board board) {
         // Check if player1 has all empty pits
         boolean player1AllEmpty = true;
-        for(int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++){
-            player1AllEmpty = player1AllEmpty &&  board.getPits().get(i).getStoneCount() == 0;
+        for (int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++) {
+            player1AllEmpty = player1AllEmpty && board.getPits().get(i).getStoneCount() == 0;
         }
 
         boolean player2AllEmpty = true;
-        for(int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++){
-            player2AllEmpty = player2AllEmpty &&  board.getPits().get(i).getStoneCount() == 0;
+        for (int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++) {
+            player2AllEmpty = player2AllEmpty && board.getPits().get(i).getStoneCount() == 0;
         }
 
         return player1AllEmpty && player2AllEmpty;
@@ -284,12 +287,13 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Checks if the pit is one of current player's normal pits (Non Kalah pit)
+     *
      * @param currentTurn The player turn
-     * @param pitToCheck The {@link Pit} to be checked
+     * @param pitToCheck  The {@link Pit} to be checked
      * @return True if the it's one of the player's pits except Kalah
      */
     private boolean isMyOwnNormalPit(PlayerTurn currentTurn, Pit pitToCheck) {
-        if(pitToCheck.isKalah()){
+        if (pitToCheck.isKalah()) {
             return false;
         }
 
@@ -310,8 +314,9 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Checks if the pit is current player's Kalah
+     *
      * @param currentTurn The player turn
-     * @param pitToCheck The {@link Pit} to be checked
+     * @param pitToCheck  The {@link Pit} to be checked
      * @return True if the it's the player's Kalah, false otherwise
      */
     private boolean isMyKalah(PlayerTurn currentTurn, Pit pitToCheck) {
@@ -330,8 +335,9 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * Checks if the pit is opponent player's Kalah
+     *
      * @param currentTurn The player turn
-     * @param pitToCheck The {@link Pit} to be checked
+     * @param pitToCheck  The {@link Pit} to be checked
      * @return True if the it's the opponent player's Kalah, false otherwise
      */
     private boolean isOpponentKalah(PlayerTurn currentTurn, Pit pitToCheck) {
@@ -350,7 +356,8 @@ public class BoardService implements CrudService<Board> {
 
     /**
      * returns the Kalah of the current player
-     * @param board The board
+     *
+     * @param board       The board
      * @param currentTurn The player turn
      * @return The Kalah pit of the current
      */

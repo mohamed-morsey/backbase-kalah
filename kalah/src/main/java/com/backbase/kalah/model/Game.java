@@ -18,16 +18,18 @@ public class Game {
     private Board board;
     private long player1Id;
     private long player2Id;
+    private String uri;
 
     public Game() {
         id = 0L;
     }
 
-    public Game(Board board, long player1Id, long player2Id) {
+    public Game(Board board, long player1Id, long player2Id, String uri) {
         this();
         this.board = board;
         this.player1Id = player1Id;
         this.player2Id = player2Id;
+        this.uri = uri;
     }
 
     @Id
@@ -65,6 +67,14 @@ public class Game {
         this.player2Id = player2Id;
     }
 
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -92,6 +102,7 @@ public class Game {
                 ", board=" + board +
                 ", player1Id=" + player1Id +
                 ", player2Id=" + player2Id +
+                ", uri='" + uri + '\'' +
                 '}';
     }
 }
