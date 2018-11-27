@@ -53,7 +53,7 @@ public class BoardService implements CrudService<Board> {
 
     @Override
     public Optional<Board> get(long id) {
-        return Optional.of(boardRepository.findOne(id));
+        return Optional.ofNullable(boardRepository.findOne(id));
     }
 
     @Override

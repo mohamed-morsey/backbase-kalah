@@ -37,7 +37,7 @@ public class GameService implements CrudService<Game> {
 
     @Override
     public Optional<Game> get(long id) {
-        return Optional.of(gameRepository.findOne(id));
+        return Optional.ofNullable(gameRepository.findOne(id));
     }
 
     @Override

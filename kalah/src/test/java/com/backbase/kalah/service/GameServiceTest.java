@@ -3,6 +3,7 @@ package com.backbase.kalah.service;
 import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.repository.GameRepository;
+import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
@@ -66,8 +68,29 @@ public class GameServiceTest {
                 });
     }
 
+    /**
+     * Tests {@link GameService#get(long)} for nonexistent game
+     */
+    @Test
+    public void testGetForNonexistentGame() {
+        when(gameRepository.findOne(GAME_ID)).thenReturn(null);
+
+        Optional<Game> existingGameOptional = gameService.get(GAME_ID);
+
+        assertThat(existingGameOptional).isEmpty();
+    }
+
+    /**
+     * Tests {@link GameService#getAll()} for nonexistent game
+     */
     @Test
     public void getAll() {
+        when(gameRepository.findAll()).thenReturn(ImmutableList.of(testGame));
+
+        List<Game> allGames = gameService.getAll();
+
+        assertThat(allGames).isNotEmpty();
+        assertThat(allGames).containsExactly(testGame);
     }
 
     @Test
