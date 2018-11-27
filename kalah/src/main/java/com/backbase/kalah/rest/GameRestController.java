@@ -65,13 +65,6 @@ public class GameRestController {
 
         Game newGame = gameOptional.get();
 
-//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(gameOptional.get().getId())
-//                .toUri();
-////        newGame.setUri(location.toString());
-//        gameService.update(newGame); // Update the new game with the correct URI
-
         GameDto gameDto = new GameDto();
         mapper.map(newGame, gameDto);
 
@@ -134,7 +127,6 @@ public class GameRestController {
         }
 
         GameStatusDto dto = GameStatusDtoConverter.toGameStatusDto(gameOptional.get());
-
         return ResponseEntity.ok().body(dto);
     }
 

@@ -207,7 +207,39 @@ public class GameServiceTest {
                 });
     }
 
+    /**
+     * Tests {@link GameService#makeMove(long, int)}
+     */
     @Test
-    public void makeMove() {
+    public void testMakeMove() {
+        when(gameRepository.findOne(GAME_ID)).thenReturn(testGame);
+
+        Optional<Game> gameOptional = gameService.makeMove(GAME_ID, 1);
+
+        assertThat(gameOptional).isPresent();
+        assertThat(gameOptional).hasValueSatisfying(
+                game -> {
+                    assertThat(game.getId()).isEqualTo(GAME_ID);
+                });
+    }
+
+    /**
+     * Tests {@link GameService#makeMove(long, int)} for nonexistent game
+     */
+    @Test
+    public void testMakeMoveForNonexistentGame(){
+    when(gameRepository.findOne(GAME_ID)).thenReturn(null);
+
+        Optional<Game> gameOptional = gameService.makeMove(GAME_ID, 1);
+
+        assertThat(gameOptional).isEmpty();
+    }
+
+    /**
+     * Tests {@link GameService#makeMove(long, int)} for invalid pit ID
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testMakeMoveForInvalidPitId(){
+        gameService.makeMove(GAME_ID, 20);
     }
 }

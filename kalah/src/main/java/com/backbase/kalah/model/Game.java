@@ -1,7 +1,6 @@
 package com.backbase.kalah.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
