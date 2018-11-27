@@ -78,11 +78,18 @@ public class GameService implements CrudService<Game> {
         return gameRepository.exists(id);
     }
 
-    public Optional<Game> createNewGame() {
+    public Optional<Game> createNewGame(String baseUri) {
         Game newGame = new Game();
         newGame.setBoard(boardService.createInitializedBoard());
 
-        return Optional.of(gameRepository.save(newGame));
+        // First we should insert the game in order to get an ID generated from database
+        Game insertedGame = gameRepository.save(newGame);
+
+        // Set the URI with the correct game URI, and update it in database
+        insertedGame.setUri(baseUri + "/" + insertedGame.getId());
+        update(insertedGame);
+
+        return Optional.of(insertedGame);
     }
 
     /**

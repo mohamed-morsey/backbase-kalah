@@ -1,10 +1,14 @@
 package com.backbase.kalah.model;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 /**
  * Represents a Kalah game
@@ -15,15 +19,21 @@ import javax.persistence.OneToOne;
 @Entity
 public class Game {
     private long id;
+
+    @NotNull
     private Board board;
+
+    @NotNull
     private String uri;
 
     public Game() {
         id = 0L;
+        board = new Board();
+        uri = StringUtils.EMPTY;
     }
 
     public Game(Board board, String uri) {
-        this();
+        id = 0L;
         this.board = board;
         this.uri = uri;
     }

@@ -55,7 +55,8 @@ public class GameRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDto> createGame() {
-        Optional<Game> gameOptional = gameService.createNewGame();
+        String baseUri = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
+        Optional<Game> gameOptional = gameService.createNewGame(baseUri);
 
         if (!gameOptional.isPresent()) {
             logger.warn(GAME_CREATION_FAILED_ERROR);
@@ -64,17 +65,17 @@ public class GameRestController {
 
         Game newGame = gameOptional.get();
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(gameOptional.get().getId())
-                .toUri();
-        newGame.setUri(location.toString());
-        gameService.update(newGame); // Update the new game with the correct URI
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(gameOptional.get().getId())
+//                .toUri();
+////        newGame.setUri(location.toString());
+//        gameService.update(newGame); // Update the new game with the correct URI
 
         GameDto gameDto = new GameDto();
         mapper.map(newGame, gameDto);
 
-        return ResponseEntity.created(location).body(gameDto);
+        return ResponseEntity.created(URI.create(gameDto.getUri())).body(gameDto);
     }
 
     @PutMapping(path = "/{id}/" + PITS_CONTEXT_PATH + "/{pitId}",

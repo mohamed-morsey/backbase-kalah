@@ -32,6 +32,7 @@ public class GameServiceTest {
     private static final long GAME_ID = 1L;
     private static final String GAME_URI = "http://example.org/games/1";
     private static final String MODIFIED_GAME_URI = "http://example.org/games/123";
+    private static final String BASE_URI = "http://example.org/games";
     //endregion
 
     @Mock private Logger logger;
@@ -48,11 +49,6 @@ public class GameServiceTest {
         Board emptyBoard = new Board();
         testGame = new Game(emptyBoard, GAME_URI);
         testGame.setId(GAME_ID);
-    }
-
-    @Test
-    public void createNewGame() {
-        //gameService.createNewGame();
     }
 
     /**
@@ -145,16 +141,70 @@ public class GameServiceTest {
         assertThat(updateSuccessful).isFalse();
     }
 
+    /**
+     * Tests {@link GameService#delete(long)}
+     */
     @Test
-    public void delete() {
+    public void tesDelete() {
+        when(gameRepository.exists(GAME_ID)).thenReturn(true);
+
+        boolean deletionSuccessful = gameService.delete(GAME_ID);
+
+        assertThat(deletionSuccessful).isTrue();
+        verify(gameRepository).delete(GAME_ID);
     }
 
+    /**
+     * Tests {@link GameService#delete(long)} for nonexistent game
+     */
     @Test
-    public void exists() {
+    public void tesDeleteForNonexistentGame() {
+        when(gameRepository.exists(GAME_ID)).thenReturn(false);
+
+        boolean deletionSuccessful = gameService.delete(GAME_ID);
+
+        assertThat(deletionSuccessful).isFalse();
     }
 
+    /**
+     * Tests {@link GameService#exists(long)}
+     */
     @Test
-    public void createNewGame1() {
+    public void testExists() {
+        when(gameRepository.exists(GAME_ID)).thenReturn(true);
+
+        boolean exists = gameService.exists(GAME_ID);
+
+        assertThat(exists).isTrue();
+    }
+
+    /**
+     * Tests {@link GameService#exists(long)} for nonexistent game
+     */
+    @Test
+    public void testExistsForNonexistentGame() {
+        when(gameRepository.exists(GAME_ID)).thenReturn(false);
+
+        boolean exists = gameService.exists(GAME_ID);
+
+        assertThat(exists).isFalse();
+    }
+
+    /**
+     * Tests {@link GameService#createNewGame(String)}
+     */
+    @Test
+    public void testCreateNewGame() {
+        when(boardService.createInitializedBoard()).thenReturn(new Board());
+        when(gameRepository.save(any(Game.class))).thenReturn(testGame);
+
+        Optional<Game> newGameOptional = gameService.createNewGame(BASE_URI);
+
+        assertThat(newGameOptional).isPresent();
+        assertThat(newGameOptional).hasValueSatisfying(
+                game -> {
+                    assertThat(game.getId()).isEqualTo(GAME_ID);
+                });
     }
 
     @Test
