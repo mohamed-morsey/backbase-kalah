@@ -11,11 +11,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.modelmapper.ModelMapper;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 /**
@@ -29,6 +31,7 @@ public class GameServiceTest {
     //region field values
     private static final long GAME_ID = 1L;
     private static final String GAME_URI = "http://example.org/games/1";
+    private static final String MODIFIED_GAME_URI = "http://example.org/games/123";
     //endregion
 
     @Mock private Logger logger;
@@ -38,6 +41,7 @@ public class GameServiceTest {
     @InjectMocks private GameService gameService;
 
     private Game testGame;
+    private ModelMapper mapper = new ModelMapper();
 
     @Before
     public void setUp() throws Exception {
@@ -73,6 +77,7 @@ public class GameServiceTest {
      */
     @Test
     public void testGetForNonexistentGame() {
+
         when(gameRepository.findOne(GAME_ID)).thenReturn(null);
 
         Optional<Game> existingGameOptional = gameService.get(GAME_ID);
@@ -81,10 +86,10 @@ public class GameServiceTest {
     }
 
     /**
-     * Tests {@link GameService#getAll()} for nonexistent game
+     * Tests {@link GameService#getAll()}
      */
     @Test
-    public void getAll() {
+    public void testGetAll() {
         when(gameRepository.findAll()).thenReturn(ImmutableList.of(testGame));
 
         List<Game> allGames = gameService.getAll();
@@ -93,12 +98,51 @@ public class GameServiceTest {
         assertThat(allGames).containsExactly(testGame);
     }
 
+    /**
+     * Tests {@link GameService#create(Game)}
+     */
     @Test
-    public void create() {
+    public void testCreate() {
+        when(gameRepository.save(any(Game.class))).thenReturn(testGame);
+
+        Game newGame = gameService.create(testGame);
+
+        assertThat(newGame).isNotNull();
+        assertThat(newGame.getId()).isEqualTo(GAME_ID);
     }
 
+    /**
+     * Tests {@link GameService#update(Game)}
+     */
     @Test
-    public void update() {
+    public void testUpdate() {
+        Game modifiedGame = new Game();
+        mapper.map(testGame, modifiedGame);
+        modifiedGame.setUri(MODIFIED_GAME_URI);
+
+        when(gameRepository.exists(GAME_ID)).thenReturn(true);
+        when(gameRepository.save(any(Game.class))).thenReturn(modifiedGame);
+
+        boolean updateSuccessful = gameService.update(modifiedGame);
+
+        assertThat(updateSuccessful).isTrue();
+        verify(gameRepository).save(modifiedGame);
+    }
+
+    /**
+     * Tests {@link GameService#update(Game)} for nonexistent game
+     */
+    @Test
+    public void testUpdateForNonexistentGame() {
+        Game modifiedGame = new Game();
+        mapper.map(testGame, modifiedGame);
+        modifiedGame.setUri(MODIFIED_GAME_URI);
+
+        when(gameRepository.exists(GAME_ID)).thenReturn(false);
+
+        boolean updateSuccessful = gameService.update(modifiedGame);
+
+        assertThat(updateSuccessful).isFalse();
     }
 
     @Test
