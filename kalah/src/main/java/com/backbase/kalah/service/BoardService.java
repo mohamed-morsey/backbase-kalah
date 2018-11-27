@@ -194,7 +194,7 @@ public class BoardService implements CrudService<Board> {
 
         // If the last placed stone is dropped into an empty pit (one of her own pits not her opponents)
         // then we should collect all opposite pit stones if not zero
-        if ((lastVisitedPit.getStoneCount() == 1) && isMyOwnNormalPit(playerTurn, lastVisitedPit)) {
+        if ((lastVisitedPit.getStoneCount() == 1) && (isMyOwnNormalPit(playerTurn, lastVisitedPit))) {
             Pit oppositePit = board.getPits().get(lastVisitedPit.getOppositePitIndex());
             if (oppositePit.getStoneCount() != 0) {
                 int totalStones = lastVisitedPit.getStoneCount() + oppositePit.getStoneCount();
