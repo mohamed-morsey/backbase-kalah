@@ -16,10 +16,11 @@ import org.modelmapper.ModelMapper;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Test class for {@link GameService}
  *
@@ -35,11 +36,15 @@ public class GameServiceTest {
     private static final String BASE_URI = "http://example.org/games";
     //endregion
 
-    @Mock private Logger logger;
-    @Mock private GameRepository gameRepository;
-    @Mock private BoardService boardService;
+    @Mock
+    private Logger logger;
+    @Mock
+    private GameRepository gameRepository;
+    @Mock
+    private BoardService boardService;
 
-    @InjectMocks private GameService gameService;
+    @InjectMocks
+    private GameService gameService;
 
     private Game testGame;
     private ModelMapper mapper = new ModelMapper();
@@ -91,7 +96,7 @@ public class GameServiceTest {
         List<Game> allGames = gameService.getAll();
 
         assertThat(allGames).isNotEmpty();
-        assertThat(allGames).containsExactly(testGame);
+        assertThat(allGames).containsExactlyInAnyOrder(testGame);
     }
 
     /**
@@ -227,8 +232,8 @@ public class GameServiceTest {
      * Tests {@link GameService#makeMove(long, int)} for nonexistent game
      */
     @Test
-    public void testMakeMoveForNonexistentGame(){
-    when(gameRepository.findOne(GAME_ID)).thenReturn(null);
+    public void testMakeMoveForNonexistentGame() {
+        when(gameRepository.findOne(GAME_ID)).thenReturn(null);
 
         Optional<Game> gameOptional = gameService.makeMove(GAME_ID, 1);
 
@@ -236,10 +241,18 @@ public class GameServiceTest {
     }
 
     /**
-     * Tests {@link GameService#makeMove(long, int)} for invalid pit ID
+     * Tests {@link GameService#makeMove(long, int)} for negative pit ID
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testMakeMoveForInvalidPitId(){
+    public void testMakeMoveForNegativePitId() {
+        gameService.makeMove(GAME_ID, -1);
+    }
+
+    /**
+     * Tests {@link GameService#makeMove(long, int)} for large pit ID exceeding the number of allowed pits
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testMakeMoveForLargePitId() {
         gameService.makeMove(GAME_ID, 20);
     }
 }

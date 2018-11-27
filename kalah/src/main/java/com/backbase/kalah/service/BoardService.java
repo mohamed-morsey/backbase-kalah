@@ -91,24 +91,16 @@ public class BoardService implements CrudService<Board> {
     }
 
     /**
-     * Creates a new initialized {@link Board}
+     * Creates a new initialized {@link Board} and saves it into database
      *
      * @return The newly created board
      */
     public Board createInitializedBoard() {
-        Board board = new Board();
-
-        List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_OF_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
-        List<Pit> player2Pits = initPlayerPits(board, COUNT_OF_PLAYER_PITS, COUNT_OF_ALL_PITS - 1, COUNT_OF_PLAYER_PITS - 2);
-
-        List<Pit> allPits = new ArrayList<>(player1Pits);
-        allPits.addAll(player2Pits);
-
-        board.setPits(allPits);
-        logger.info(NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE);
+        Board board = initBoard();
 
         return create(board);
     }
+
 
     /**
      * Makes a move on the given board
@@ -154,6 +146,25 @@ public class BoardService implements CrudService<Board> {
         }
 
         return Optional.of(makeMove(board, desiredPit));
+    }
+
+    /**
+     * Creates a new initialized {@link Board}
+     *
+     * @return The newly created board
+     */
+    Board initBoard() {
+        Board board = new Board();
+
+        List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_OF_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
+        List<Pit> player2Pits = initPlayerPits(board, COUNT_OF_PLAYER_PITS, COUNT_OF_ALL_PITS - 1, COUNT_OF_PLAYER_PITS - 2);
+
+        List<Pit> allPits = new ArrayList<>(player1Pits);
+        allPits.addAll(player2Pits);
+
+        board.setPits(allPits);
+        logger.info(NEW_BOARD_INITIALIZED_SUCCESSFULLY_MESSAGE);
+        return board;
     }
 
     /**
