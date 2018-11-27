@@ -24,7 +24,7 @@ public class Pit {
 
     private Board board;
 
-    public Pit(){
+    public Pit() {
         this.id = 0L;
     }
 
@@ -88,8 +88,8 @@ public class Pit {
     }
 
     // Increments the number of stones by one
-    public int incrementStones(int stonesToAdd){
-        stoneCount+=stonesToAdd;
+    public int incrementStones(int stonesToAdd) {
+        stoneCount += stonesToAdd;
         return stoneCount;
     }
 

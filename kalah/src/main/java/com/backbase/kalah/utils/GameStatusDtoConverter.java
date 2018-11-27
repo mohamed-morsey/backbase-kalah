@@ -13,15 +13,15 @@ import java.util.Map;
  * Date: 2018-11-26
  **/
 public class GameStatusDtoConverter {
-    private GameStatusDtoConverter(){
+    private GameStatusDtoConverter() {
         // private constructor to prevent instantiation
     }
 
-    public static GameStatusDto toGameStatusDto(Game game){
+    public static GameStatusDto toGameStatusDto(Game game) {
         Map<String, String> boardStatus = new HashMap<>();
         Board gameBoard = game.getBoard();
 
-        for (Pit pit :gameBoard.getPits()) {
+        for (Pit pit : gameBoard.getPits()) {
             // We add 1 here as the output should be 1 based not 0 based
             boardStatus.put(String.valueOf(pit.getIndex() + 1), String.valueOf(pit.getStoneCount()));
         }

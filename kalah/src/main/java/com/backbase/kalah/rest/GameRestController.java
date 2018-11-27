@@ -2,9 +2,9 @@ package com.backbase.kalah.rest;
 
 import com.backbase.kalah.dto.GameDto;
 import com.backbase.kalah.dto.GameStatusDto;
-import com.backbase.kalah.utils.GameStatusDtoConverter;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.service.GameService;
+import com.backbase.kalah.utils.GameStatusDtoConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -96,7 +96,7 @@ public class GameRestController {
         Optional<Game> gameOptional = gameService.makeMove(idLong, pitIdLong - 1);
 
         // In case the game is not found in the system gameOptional will be Optional#EMPTY
-        if(!gameOptional.isPresent()){
+        if (!gameOptional.isPresent()) {
             logger.warn(GAME_NOT_FOUND_ERROR);
             return ResponseEntity.notFound().build();
         }

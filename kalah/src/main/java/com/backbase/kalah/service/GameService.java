@@ -1,6 +1,5 @@
 package com.backbase.kalah.service;
 
-import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.repository.GameRepository;
 import com.google.common.base.Preconditions;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
-import static com.backbase.kalah.constant.Messages.BOARD_NOT_FOUND_ERROR;
 import static com.backbase.kalah.constant.Messages.GAME_NOT_FOUND_ERROR;
 import static com.backbase.kalah.constant.Messages.INVALID_PIT_ID_ERROR;
 import static com.backbase.kalah.constant.Messages.ITEM_NOT_FOUND_ERROR;
@@ -76,7 +74,7 @@ public class GameService implements CrudService<Game> {
         return true;
     }
 
-    public boolean exists(long id){
+    public boolean exists(long id) {
         return gameRepository.exists(id);
     }
 

@@ -171,10 +171,12 @@ public class BoardService implements CrudService<Board> {
         Pit lastVisitedPit = pit; // represents the last pit that received a stone
         Pit nextPit = board.getPits().get(pit.getNextPitIndex());
 
-        for (int i = 0; i < stones; i++) {
+        int i = 0;
+        while (i < stones) {
             // If it is not my own Kalah, then I should not drop a stone into it
             if (!isOpponentKalah(playerTurn, nextPit)) {
                 nextPit.incrementStones(1);
+                i++;
             }
 
             lastVisitedPit = nextPit;
