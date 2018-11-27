@@ -105,4 +105,5 @@ public class GameService implements CrudService<Game> {
         boardService.makeMove(desiredGame.getBoard().getId(), pitId);
         return Optional.of(desiredGame);
     }
+
 }

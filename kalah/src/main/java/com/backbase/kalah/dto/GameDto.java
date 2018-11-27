@@ -1,6 +1,7 @@
 package com.backbase.kalah.dto;
 
 import com.backbase.kalah.model.Game;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * View object for {@link Game} that represents a just-created game
@@ -11,6 +12,11 @@ import com.backbase.kalah.model.Game;
 public class GameDto {
     private long id;
     private String uri;
+
+    public GameDto() {
+        this.id = 0L;
+        this.uri = StringUtils.EMPTY;
+    }
 
     public GameDto(long id, String uri) {
         this.id = id;

@@ -16,19 +16,15 @@ import javax.persistence.OneToOne;
 public class Game {
     private long id;
     private Board board;
-    private long player1Id;
-    private long player2Id;
     private String uri;
 
     public Game() {
         id = 0L;
     }
 
-    public Game(Board board, long player1Id, long player2Id, String uri) {
+    public Game(Board board, String uri) {
         this();
         this.board = board;
-        this.player1Id = player1Id;
-        this.player2Id = player2Id;
         this.uri = uri;
     }
 
@@ -49,22 +45,6 @@ public class Game {
 
     public void setBoard(Board board) {
         this.board = board;
-    }
-
-    public long getPlayer1Id() {
-        return player1Id;
-    }
-
-    public void setPlayer1Id(long player1Id) {
-        this.player1Id = player1Id;
-    }
-
-    public long getPlayer2Id() {
-        return player2Id;
-    }
-
-    public void setPlayer2Id(long player2Id) {
-        this.player2Id = player2Id;
     }
 
     public String getUri() {
@@ -100,8 +80,6 @@ public class Game {
         return "Game{" +
                 "id=" + id +
                 ", board=" + board +
-                ", player1Id=" + player1Id +
-                ", player2Id=" + player2Id +
                 ", uri='" + uri + '\'' +
                 '}';
     }

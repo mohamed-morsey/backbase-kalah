@@ -284,7 +284,8 @@ public class BoardService implements CrudService<Board> {
             player2AllEmpty = player2AllEmpty && board.getPits().get(i).getStoneCount() == 0;
         }
 
-        return player1AllEmpty && player2AllEmpty;
+        // Check if one player has no more stones
+        return player1AllEmpty || player2AllEmpty;
     }
 
     /**

@@ -5,7 +5,7 @@ import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.model.Pit;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +18,7 @@ public class GameStatusDtoConverter {
     }
 
     public static GameStatusDto toGameStatusDto(Game game) {
-        Map<String, String> boardStatus = new HashMap<>();
+        Map<String, String> boardStatus = new LinkedHashMap<>();
         Board gameBoard = game.getBoard();
 
         for (Pit pit : gameBoard.getPits()) {

@@ -7,9 +7,11 @@ import com.backbase.kalah.service.GameService;
 import com.backbase.kalah.utils.GameStatusDtoConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +44,8 @@ public class GameRestController {
     private GameService gameService;
     private Logger logger;
 
+    private ModelMapper mapper = new ModelMapper(); // Mapper for converting between entities and DTOs
+
     @Inject
     public GameRestController(GameService gameService, Logger logger) {
         this.gameService = gameService;
@@ -67,7 +71,8 @@ public class GameRestController {
         newGame.setUri(location.toString());
         gameService.update(newGame); // Update the new game with the correct URI
 
-        GameDto gameDto = new GameDto(newGame.getId(), newGame.getUri());
+        GameDto gameDto = new GameDto();
+        mapper.map(newGame, gameDto);
 
         return ResponseEntity.created(location).body(gameDto);
     }
@@ -94,6 +99,32 @@ public class GameRestController {
 
         // pitId - 1 as it should be zero based but in the interface is it's one based
         Optional<Game> gameOptional = gameService.makeMove(idLong, pitIdLong - 1);
+
+        // In case the game is not found in the system gameOptional will be Optional#EMPTY
+        if (!gameOptional.isPresent()) {
+            logger.warn(GAME_NOT_FOUND_ERROR);
+            return ResponseEntity.notFound().build();
+        }
+
+        GameStatusDto dto = GameStatusDtoConverter.toGameStatusDto(gameOptional.get());
+
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @GetMapping(path = "/{id}/",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getGameScore(@PathVariable(ID_PARAMETER) final String id) {
+        // Check if a valid game ID is passed
+        if ((StringUtils.isBlank(id)) || (!StringUtils.isNumeric(id))) {
+            logger.warn(INVALID_ID_ERROR);
+            throw new IllegalArgumentException(INVALID_ID_ERROR);
+        }
+
+        long idLong = Long.parseLong(id);
+
+        // pitId - 1 as it should be zero based but in the interface is it's one based
+        Optional<Game> gameOptional = gameService.get(idLong);
 
         // In case the game is not found in the system gameOptional will be Optional#EMPTY
         if (!gameOptional.isPresent()) {
