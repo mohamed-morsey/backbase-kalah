@@ -6,12 +6,12 @@ package com.backbase.kalah.error;
  * @author Mohamed Morsey
  * Date: 2018-11-25
  **/
-public class KalahPlayException extends RuntimeException {
-    public KalahPlayException(String message) {
+public class KalahGameException extends RuntimeException {
+    public KalahGameException(String message) {
         super(message);
     }
 
-    public KalahPlayException(String message, Throwable exp) {
+    public KalahGameException(String message, Throwable exp) {
         super(message, exp);
     }
 }

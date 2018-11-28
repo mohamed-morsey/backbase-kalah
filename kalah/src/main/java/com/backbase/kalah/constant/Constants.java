@@ -13,6 +13,9 @@ public final class Constants {
 
     public static final int INITIAL_STONE_COUNT = 6;
 
+    public static final int PLAYER_1_KALAH = 6;
+    public static final int PLAYER_2_KALAH = 13;
+
     private Constants() {
         // Private constructor to prevent instantiation
     }

@@ -57,14 +57,14 @@ public class KalahGameExceptionHandler {
     }
 
     /**
-     * Handler for {@link KalahPlayException} that can be thrown if an item does not exist
+     * Handler for {@link KalahGameException} that can be thrown if an item does not exist
      *
      * @param exp      Exception to be handled
      * @param response The response object
      * @throws IOException
      */
-    @ExceptionHandler(KalahPlayException.class)
-    private void handleKalahPlayException(KalahPlayException exp, HttpServletResponse response) throws IOException {
+    @ExceptionHandler(KalahGameException.class)
+    private void handleKalahPlayException(KalahGameException exp, HttpServletResponse response) throws IOException {
         String errorMessage = OPERATION_FAILURE_ERROR + ": " + exp.getMessage();
 
         logger.error(errorMessage, exp);

@@ -1,11 +1,14 @@
 package com.backbase.kalah.service;
 
+import com.backbase.kalah.error.KalahGameException;
 import com.backbase.kalah.model.Board;
 import com.backbase.kalah.repository.BoardRepository;
 import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,8 +19,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
+import static com.backbase.kalah.constant.Constants.PLAYER_1_KALAH;
+import static com.backbase.kalah.constant.Constants.PLAYER_2_KALAH;
+import static com.backbase.kalah.constant.Messages.GAME_FINISHED_ERROR;
+import static com.backbase.kalah.constant.Messages.INVALID_PIT_ID_ERROR;
+import static com.backbase.kalah.constant.Messages.KALAH_MOVE_ERROR;
 import static com.backbase.kalah.model.enums.PlayerTurn.FIRST_PLAYER;
 import static com.backbase.kalah.model.enums.PlayerTurn.SECOND_PLAYER;
+import static com.backbase.kalah.model.enums.Status.FINISHED;
 import static com.backbase.kalah.model.enums.Status.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -32,13 +41,14 @@ import static org.mockito.Mockito.when;
  **/
 @RunWith(MockitoJUnitRunner.class)
 public class BoardServiceTest {
+    public static final int INVALID_PIT_ID = 20;
     //region field values
     private static final long BOARD_ID = 1L;
     private static final int PIT_0 = 0;
     private static final int PIT_1 = 1;
-    private static final int PLAYER_1_KALAH = 6;
-    private static final int PLAYER_2_KALAH = 13;
     //endregion
+    @Rule
+    public ExpectedException thrownException = ExpectedException.none();
 
     @Mock
     private Logger logger;
@@ -237,5 +247,43 @@ public class BoardServiceTest {
         Optional<Board> boardOptional = boardService.makeMove(BOARD_ID, PIT_0);
 
         assertThat(boardOptional).isEmpty();
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} for an invalid pit ID
+     */
+    @Test
+    public void testMakeMoveForInvalidPitId() {
+        thrownException.expect(IllegalArgumentException.class);
+        thrownException.expectMessage(INVALID_PIT_ID_ERROR);
+
+        boardService.makeMove(BOARD_ID, INVALID_PIT_ID);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} for an-already finished game
+     */
+    @Test
+    public void testMakeMoveForFinishedGame() {
+        thrownException.expect(KalahGameException.class);
+        thrownException.expectMessage(GAME_FINISHED_ERROR);
+
+        testBoard.setStatus(FINISHED);
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+
+        boardService.makeMove(BOARD_ID, PIT_1);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} for pit ID refers to a Kalah
+     */
+    @Test
+    public void testMakeMoveWithPitIsKalah() {
+        thrownException.expect(KalahGameException.class);
+        thrownException.expectMessage(KALAH_MOVE_ERROR);
+
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+
+        boardService.makeMove(BOARD_ID, PLAYER_2_KALAH);
     }
 }

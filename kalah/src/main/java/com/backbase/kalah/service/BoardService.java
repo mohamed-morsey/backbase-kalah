@@ -1,7 +1,7 @@
 package com.backbase.kalah.service;
 
 import com.backbase.kalah.constant.Constants;
-import com.backbase.kalah.error.KalahPlayException;
+import com.backbase.kalah.error.KalahGameException;
 import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Pit;
 import com.backbase.kalah.model.enums.GameResult;
@@ -20,6 +20,8 @@ import java.util.Optional;
 import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 import static com.backbase.kalah.constant.Constants.COUNT_OF_PLAYER_PITS;
 import static com.backbase.kalah.constant.Constants.INITIAL_STONE_COUNT;
+import static com.backbase.kalah.constant.Constants.PLAYER_1_KALAH;
+import static com.backbase.kalah.constant.Constants.PLAYER_2_KALAH;
 import static com.backbase.kalah.constant.Messages.BOARD_NOT_FOUND_ERROR;
 import static com.backbase.kalah.constant.Messages.GAME_FINISHED_ERROR;
 import static com.backbase.kalah.constant.Messages.INVALID_PIT_ID_ERROR;
@@ -123,26 +125,26 @@ public class BoardService implements CrudService<Board> {
         // check if the game is still running
         if (board.getStatus() != RUNNING) {
             logger.warn(GAME_FINISHED_ERROR);
-            throw new KalahPlayException(GAME_FINISHED_ERROR);
+            throw new KalahGameException(GAME_FINISHED_ERROR);
         }
 
         // Check if the player wants to play from a Kalah
         if (isKalah(pitId)) {
             logger.warn(KALAH_MOVE_ERROR);
-            throw new KalahPlayException(KALAH_MOVE_ERROR);
+            throw new KalahGameException(KALAH_MOVE_ERROR);
         }
 
         // Check if it is the player's turn
         if (!isPlayerTurn(board, pitId)) {
             logger.warn(NOT_PLAYER_TURN_ERROR);
-            throw new KalahPlayException(NOT_PLAYER_TURN_ERROR);
+            throw new KalahGameException(NOT_PLAYER_TURN_ERROR);
         }
 
         Pit desiredPit = board.getPits().get(pitId);
         int stones = desiredPit.getStoneCount();
         if (stones == 0) {
             logger.warn(PIT_EMPTY_ERROR);
-            throw new KalahPlayException(PIT_EMPTY_ERROR + ", " + PLAY_AGAIN_MESSAGE);
+            throw new KalahGameException(PIT_EMPTY_ERROR + ", " + PLAY_AGAIN_MESSAGE);
         }
 
         return Optional.of(makeMove(board, desiredPit));
@@ -156,8 +158,8 @@ public class BoardService implements CrudService<Board> {
     Board initBoard() {
         Board board = new Board();
 
-        List<Pit> player1Pits = initPlayerPits(board, 0, COUNT_OF_PLAYER_PITS - 1, COUNT_OF_ALL_PITS - 2);
-        List<Pit> player2Pits = initPlayerPits(board, COUNT_OF_PLAYER_PITS, COUNT_OF_ALL_PITS - 1, COUNT_OF_PLAYER_PITS - 2);
+        List<Pit> player1Pits = initPlayerPits(board, 0, PLAYER_1_KALAH, COUNT_OF_ALL_PITS - 2);
+        List<Pit> player2Pits = initPlayerPits(board, COUNT_OF_PLAYER_PITS, PLAYER_2_KALAH, COUNT_OF_PLAYER_PITS - 2);
 
         List<Pit> allPits = new ArrayList<>(player1Pits);
         allPits.addAll(player2Pits);
@@ -258,7 +260,7 @@ public class BoardService implements CrudService<Board> {
     private void collectAllRemainingStones(Board board) {
         // Collect all stones in all pits of player1
         int player1RemainingStones = 0;
-        for (int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++) {
+        for (int i = 0; i < PLAYER_1_KALAH; i++) {
             player1RemainingStones += board.getPits().get(i).getStoneCount();
             board.getPits().get(i).setStoneCount(0);
         }
@@ -268,7 +270,7 @@ public class BoardService implements CrudService<Board> {
 
         // Collect all stones in all pits of player2
         int player2RemainingStones = 0;
-        for (int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++) {
+        for (int i = COUNT_OF_PLAYER_PITS; i < PLAYER_2_KALAH; i++) {
             player2RemainingStones += board.getPits().get(i).getStoneCount();
             board.getPits().get(i).setStoneCount(0);
         }
@@ -286,12 +288,12 @@ public class BoardService implements CrudService<Board> {
     private boolean isGameFinished(Board board) {
         // Check if player1 has all empty pits
         boolean player1AllEmpty = true;
-        for (int i = 0; i < COUNT_OF_PLAYER_PITS - 1; i++) {
+        for (int i = 0; i < PLAYER_1_KALAH; i++) {
             player1AllEmpty = player1AllEmpty && board.getPits().get(i).getStoneCount() == 0;
         }
 
         boolean player2AllEmpty = true;
-        for (int i = COUNT_OF_PLAYER_PITS; i < COUNT_OF_ALL_PITS - 1; i++) {
+        for (int i = COUNT_OF_PLAYER_PITS; i < PLAYER_2_KALAH; i++) {
             player2AllEmpty = player2AllEmpty && board.getPits().get(i).getStoneCount() == 0;
         }
 
@@ -313,13 +315,13 @@ public class BoardService implements CrudService<Board> {
 
         // First player's pits are ranged between 0 and 5
         if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() >= 0)
-                && (pitToCheck.getIndex() < COUNT_OF_PLAYER_PITS - 1)) {
+                && (pitToCheck.getIndex() < PLAYER_1_KALAH)) {
             return true;
         }
 
         // First player's pits are ranged between 7 and 12
         if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() >= COUNT_OF_PLAYER_PITS)
-                && (pitToCheck.getIndex() < COUNT_OF_ALL_PITS - 1)) {
+                && (pitToCheck.getIndex() < PLAYER_2_KALAH)) {
             return true;
         }
 
@@ -335,12 +337,12 @@ public class BoardService implements CrudService<Board> {
      */
     private boolean isMyKalah(PlayerTurn currentTurn, Pit pitToCheck) {
         // First player's Kalah is index at 6
-        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_PLAYER_PITS - 1)) {
+        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == PLAYER_1_KALAH)) {
             return true;
         }
 
         // Second player's Kalah is index at 13
-        if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_ALL_PITS - 1)) {
+        if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() == PLAYER_2_KALAH)) {
             return true;
         }
 
@@ -356,12 +358,12 @@ public class BoardService implements CrudService<Board> {
      */
     private boolean isOpponentKalah(PlayerTurn currentTurn, Pit pitToCheck) {
         // If first player's Kalah then her opponent's Kalah is at index 13
-        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_ALL_PITS - 1)) {
+        if ((currentTurn == FIRST_PLAYER) && (pitToCheck.getIndex() == PLAYER_2_KALAH)) {
             return true;
         }
 
         // If second player's Kalah then her opponent's Kalah is at index 6
-        if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() == COUNT_OF_PLAYER_PITS - 1)) {
+        if ((currentTurn == SECOND_PLAYER) && (pitToCheck.getIndex() == PLAYER_1_KALAH)) {
             return true;
         }
 
@@ -376,7 +378,7 @@ public class BoardService implements CrudService<Board> {
      * @return The Kalah pit of the current
      */
     private Pit getMyKalah(Board board, PlayerTurn currentTurn) {
-        Pit playerKalah = (currentTurn == FIRST_PLAYER) ? board.getPits().get(COUNT_OF_PLAYER_PITS - 1) : board.getPits().get(COUNT_OF_ALL_PITS - 1);
+        Pit playerKalah = (currentTurn == FIRST_PLAYER) ? board.getPits().get(PLAYER_1_KALAH) : board.getPits().get(PLAYER_2_KALAH);
         return playerKalah;
     }
 
@@ -404,7 +406,7 @@ public class BoardService implements CrudService<Board> {
         }
 
         // If the kalah of the player is ranked as 6 then the opposite one is ranked 0 and vice versa
-        int oppositeKalahIndex = (endPitIndex == COUNT_OF_PLAYER_PITS - 1) ? COUNT_OF_ALL_PITS - 1 : COUNT_OF_PLAYER_PITS - 1;
+        int oppositeKalahIndex = (endPitIndex == PLAYER_1_KALAH) ? PLAYER_2_KALAH : PLAYER_1_KALAH;
 
         // Initialize the Kalah
         Pit kalahPit = new Pit(endPitIndex, (endPitIndex + 1) % COUNT_OF_ALL_PITS, oppositeKalahIndex, 0, true);
@@ -421,7 +423,7 @@ public class BoardService implements CrudService<Board> {
      * @return True if the pit is a Kalah, false otherwise
      */
     private boolean isKalah(int pitId) {
-        return (pitId == COUNT_OF_PLAYER_PITS - 1) || (pitId == COUNT_OF_ALL_PITS - 1);
+        return (pitId == PLAYER_1_KALAH) || (pitId == PLAYER_2_KALAH);
     }
 
     /**
@@ -433,12 +435,12 @@ public class BoardService implements CrudService<Board> {
      */
     private boolean isPlayerTurn(Board board, int pitId) {
         // In case of first player the allowed pits are between 0 and 5
-        if ((board.getPlayerTurn() == FIRST_PLAYER) && (pitId >= 0 && pitId < COUNT_OF_PLAYER_PITS - 1)) {
+        if ((board.getPlayerTurn() == FIRST_PLAYER) && (pitId >= 0 && pitId < PLAYER_1_KALAH)) {
             return true;
         }
 
         // In case of first player the allowed pits are between 7 and 12
-        if ((board.getPlayerTurn() == SECOND_PLAYER) && (pitId >= COUNT_OF_PLAYER_PITS && pitId < COUNT_OF_ALL_PITS - 1)) {
+        if ((board.getPlayerTurn() == SECOND_PLAYER) && (pitId >= COUNT_OF_PLAYER_PITS && pitId < PLAYER_2_KALAH)) {
             return true;
         }
 
