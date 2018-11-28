@@ -10,8 +10,4 @@ public class KalahGameException extends RuntimeException {
     public KalahGameException(String message) {
         super(message);
     }
-
-    public KalahGameException(String message, Throwable exp) {
-        super(message, exp);
-    }
 }
