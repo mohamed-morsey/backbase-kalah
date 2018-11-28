@@ -196,8 +196,13 @@ public class BoardService implements CrudService<Board> {
             nextPit = board.getPits().get(nextPit.getNextPitIndex());
         }
 
-        // If the last one is placed into my Kalah, then we should not switch players, and no further actions are required
+        // If the last one is placed into my Kalah, then we should not switch players, just check if the game is finished
         if (isMyKalah(playerTurn, lastVisitedPit)) {
+            boolean isFinished = isGameFinished(board);
+            if (isFinished) {
+                processFinishedGame(board);
+            }
+
             return boardRepository.save(board);
         }
 
@@ -224,12 +229,17 @@ public class BoardService implements CrudService<Board> {
 
         boolean isFinished = isGameFinished(board);
         if (isFinished) {
-            board.setStatus(FINISHED);
-            collectAllRemainingStones(board);
-            GameResult winner = getWinningPlayer(board);
-            logger.info(winner);
+            processFinishedGame(board);
         }
+
         return boardRepository.save(board);
+    }
+
+    private void processFinishedGame(Board board) {
+        board.setStatus(FINISHED);
+        collectAllRemainingStones(board);
+        GameResult winner = getWinningPlayer(board);
+        logger.info(winner);
     }
 
     /**

@@ -49,6 +49,7 @@ public class BoardServiceTest {
     private static final long BOARD_ID = 1L;
     private static final int PIT_0 = 0;
     private static final int PIT_1 = 1;
+    private static final int PIT_5 = 5;
     private static final int PIT_10 = 10;
     //endregion
     @Rule
@@ -339,10 +340,10 @@ public class BoardServiceTest {
 
     /**
      * Tests {@link BoardService#makeMove(long, int)} but for the last move right before the game ends
-     * i.e. one of the players has no more stones in all her pits
+     * i.e. one of the players has no more stones in all her pits in case player 1 wins
      */
     @Test
-    public void testMakeMoveForLastMoveBeforeEnd() {
+    public void testMakeMoveForLastMoveBeforeEndWithPlayer1Wins() {
         when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
         when(boardRepository.save(testBoard)).thenReturn(testBoard);
 
@@ -359,5 +360,62 @@ public class BoardServiceTest {
 
         assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isNotZero();
         assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isEqualTo(30); // 5 pits with 6 stones each
+
+        assertThat(testBoard.getStatus()).isEqualTo(FINISHED);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but for the last move right before the game ends
+     * i.e. one of the players has no more stones in all her pits in case player 2 wins
+     */
+    @Test
+    public void testMakeMoveForLastMoveBeforeEndWithPlayer2Wins() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // In order to let the game finish quickly, we set all pits of one player to zero except one
+        for(int i = PLAYER_1_KALAH + 1; i < PLAYER_2_KALAH; i++){
+            testBoard.getPits().get(i).setStoneCount(0);
+        }
+        testBoard.getPits().get(PIT_10).setStoneCount(1);
+        testBoard.setPlayerTurn(PLAYER_2);
+
+        boardService.makeMove(BOARD_ID, PIT_10);
+
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(30);// 5 pits with 6 stones each
+
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isEqualTo(7);//1 + 6 from opposite pit
+
+        assertThat(testBoard.getStatus()).isEqualTo(FINISHED);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but for the last move right before the game ends
+     * i.e. one of the players has no more stones in all her pits in case the game ends in a tie
+     */
+    @Test
+    public void testMakeMoveForLastMoveBeforeEndWithTie() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // In order to let the game finish quickly, we set stones of all pits to 0
+        for(int i = 0; i < PLAYER_2_KALAH; i++){
+            testBoard.getPits().get(i).setStoneCount(0);
+        }
+        // Set the pit5 to 1, in order to have an available move
+        testBoard.getPits().get(PIT_5).setStoneCount(1);
+        testBoard.getPits().get(PLAYER_2_KALAH).setStoneCount(1);
+
+        boardService.makeMove(BOARD_ID, PIT_5);
+
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(1);
+
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isEqualTo(1);
+
+        assertThat(testBoard.getStatus()).isEqualTo(FINISHED);
     }
 }
