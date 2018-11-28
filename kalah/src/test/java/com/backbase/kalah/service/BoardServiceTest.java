@@ -24,8 +24,11 @@ import static com.backbase.kalah.constant.Constants.PLAYER_2_KALAH;
 import static com.backbase.kalah.constant.Messages.GAME_FINISHED_ERROR;
 import static com.backbase.kalah.constant.Messages.INVALID_PIT_ID_ERROR;
 import static com.backbase.kalah.constant.Messages.KALAH_MOVE_ERROR;
-import static com.backbase.kalah.model.enums.PlayerTurn.FIRST_PLAYER;
-import static com.backbase.kalah.model.enums.PlayerTurn.SECOND_PLAYER;
+import static com.backbase.kalah.constant.Messages.NOT_PLAYER_TURN_ERROR;
+import static com.backbase.kalah.constant.Messages.PIT_EMPTY_ERROR;
+import static com.backbase.kalah.constant.Messages.PLAY_AGAIN_MESSAGE;
+import static com.backbase.kalah.model.enums.PlayerTurn.PLAYER_1;
+import static com.backbase.kalah.model.enums.PlayerTurn.PLAYER_2;
 import static com.backbase.kalah.model.enums.Status.FINISHED;
 import static com.backbase.kalah.model.enums.Status.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +49,7 @@ public class BoardServiceTest {
     private static final long BOARD_ID = 1L;
     private static final int PIT_0 = 0;
     private static final int PIT_1 = 1;
+    private static final int PIT_10 = 10;
     //endregion
     @Rule
     public ExpectedException thrownException = ExpectedException.none();
@@ -80,7 +84,7 @@ public class BoardServiceTest {
         assertThat(existingBoardOptional).hasValueSatisfying(
                 board -> {
                     assertThat(board.getId()).isEqualTo(BOARD_ID);
-                    assertThat(board.getPlayerTurn()).isEqualTo(FIRST_PLAYER);
+                    assertThat(board.getPlayerTurn()).isEqualTo(PLAYER_1);
                 });
     }
 
@@ -129,7 +133,7 @@ public class BoardServiceTest {
     public void testUpdate() {
         Board modifiedBoard = new Board();
         mapper.map(testBoard, modifiedBoard);
-        modifiedBoard.setPlayerTurn(SECOND_PLAYER);
+        modifiedBoard.setPlayerTurn(PLAYER_2);
 
         when(boardRepository.exists(BOARD_ID)).thenReturn(true);
         when(boardRepository.save(any(Board.class))).thenReturn(modifiedBoard);
@@ -147,7 +151,7 @@ public class BoardServiceTest {
     public void testUpdateForNonexistentBoard() {
         Board modifiedBoard = new Board();
         mapper.map(testBoard, modifiedBoard);
-        modifiedBoard.setPlayerTurn(SECOND_PLAYER);
+        modifiedBoard.setPlayerTurn(PLAYER_2);
 
         when(boardRepository.exists(BOARD_ID)).thenReturn(false);
 
@@ -192,7 +196,7 @@ public class BoardServiceTest {
 
         assertThat(initializedBoard).isNotNull();
         assertThat(initializedBoard.getStatus()).isEqualTo(RUNNING);
-        assertThat(initializedBoard.getPlayerTurn()).isEqualTo(FIRST_PLAYER);
+        assertThat(initializedBoard.getPlayerTurn()).isEqualTo(PLAYER_1);
         assertThat(initializedBoard.getPits()).hasSize(COUNT_OF_ALL_PITS);
     }
 
@@ -211,7 +215,7 @@ public class BoardServiceTest {
         assertThat(boardOptional).hasValueSatisfying(
                 board -> {
                     assertThat(board.getId()).isEqualTo(BOARD_ID);
-                    assertThat(board.getPlayerTurn()).isEqualTo(SECOND_PLAYER);
+                    assertThat(board.getPlayerTurn()).isEqualTo(PLAYER_2);
                     assertThat(board.getPits().get(PIT_1).getStoneCount()).isEqualTo(0);
                 });
     }
@@ -231,7 +235,7 @@ public class BoardServiceTest {
         assertThat(boardOptional).hasValueSatisfying(
                 board -> {
                     assertThat(board.getId()).isEqualTo(BOARD_ID);
-                    assertThat(board.getPlayerTurn()).isEqualTo(FIRST_PLAYER);
+                    assertThat(board.getPlayerTurn()).isEqualTo(PLAYER_1);
                     assertThat(board.getPits().get(PIT_0).getStoneCount()).isEqualTo(0);
                     assertThat(board.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(1);
                 });
@@ -269,6 +273,7 @@ public class BoardServiceTest {
         thrownException.expectMessage(GAME_FINISHED_ERROR);
 
         testBoard.setStatus(FINISHED);
+
         when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
 
         boardService.makeMove(BOARD_ID, PIT_1);
@@ -285,5 +290,74 @@ public class BoardServiceTest {
         when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
 
         boardService.makeMove(BOARD_ID, PLAYER_2_KALAH);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but with incorrect player turn
+     */
+    @Test
+    public void testMakeMoveWithNotPlayerTurn() {
+        thrownException.expect(KalahGameException.class);
+        thrownException.expectMessage(NOT_PLAYER_TURN_ERROR);
+
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+
+        boardService.makeMove(BOARD_ID, PIT_10);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but with empty pit
+     */
+    @Test
+    public void testMakeMoveWithEmptyPit() {
+        thrownException.expect(KalahGameException.class);
+        thrownException.expectMessage(PIT_EMPTY_ERROR + ", " + PLAY_AGAIN_MESSAGE);
+
+        testBoard.getPits().get(PIT_0).setStoneCount(0);
+
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+
+        boardService.makeMove(BOARD_ID, PIT_0);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but with last dropped stone is in a en empty pit
+     */
+    @Test
+    public void testMakeMoveWithLastPitEmpty() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // Set number of stones to 13, so the last stones comes to the same pit which will be empty at this time
+        testBoard.getPits().get(PIT_0).setStoneCount(COUNT_OF_ALL_PITS - 1);
+
+        boardService.makeMove(BOARD_ID, PIT_0);
+
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(9);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but for the last move right before the game ends
+     * i.e. one of the players has no more stones in all her pits
+     */
+    @Test
+    public void testMakeMoveForLastMoveBeforeEnd() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // In order to let the game finish quickly, we set all pits of one player to zero except one
+        for(int i = 0; i < PLAYER_1_KALAH; i++){
+            testBoard.getPits().get(i).setStoneCount(0);
+        }
+        testBoard.getPits().get(PIT_0).setStoneCount(1);
+
+        boardService.makeMove(BOARD_ID, PIT_0);
+
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(7); //1 + 6 from opposite pit
+
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isNotZero();
+        assertThat(testBoard.getPits().get(PLAYER_2_KALAH).getStoneCount()).isEqualTo(30); // 5 pits with 6 stones each
     }
 }

@@ -7,7 +7,7 @@ package com.backbase.kalah.model.enums;
  * Date: 2018-11-26
  **/
 public enum GameResult {
-    FIRST_PLAYER,
-    SECOND_PLAYER,
+    PLAYER_1,
+    PLAYER_2,
     TIE
 }

@@ -7,6 +7,6 @@ package com.backbase.kalah.model.enums;
  * Date: 2018-11-25
  **/
 public enum PlayerTurn {
-    FIRST_PLAYER,
-    SECOND_PLAYER
+    PLAYER_1,
+    PLAYER_2
 }

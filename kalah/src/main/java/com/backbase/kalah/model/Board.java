@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.backbase.kalah.model.enums.PlayerTurn.FIRST_PLAYER;
+import static com.backbase.kalah.model.enums.PlayerTurn.PLAYER_1;
 import static com.backbase.kalah.model.enums.Status.RUNNING;
 
 /**
@@ -36,7 +36,7 @@ public class Board {
 
     public Board() {
         id = 0L;
-        playerTurn = FIRST_PLAYER;
+        playerTurn = PLAYER_1;
         pits = new ArrayList<>();
         status = RUNNING;
     }
