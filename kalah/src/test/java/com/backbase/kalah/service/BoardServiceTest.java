@@ -15,8 +15,10 @@ import org.modelmapper.ModelMapper;
 import java.util.List;
 import java.util.Optional;
 
+import static com.backbase.kalah.constant.Constants.COUNT_OF_ALL_PITS;
 import static com.backbase.kalah.model.enums.PlayerTurn.FIRST_PLAYER;
 import static com.backbase.kalah.model.enums.PlayerTurn.SECOND_PLAYER;
+import static com.backbase.kalah.model.enums.Status.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,10 @@ import static org.mockito.Mockito.when;
 public class BoardServiceTest {
     //region field values
     private static final long BOARD_ID = 1L;
+    private static final int PIT_0 = 0;
+    private static final int PIT_1 = 1;
+    private static final int PLAYER_1_KALAH = 6;
+    private static final int PLAYER_2_KALAH = 13;
     //endregion
 
     @Mock
@@ -165,11 +171,59 @@ public class BoardServiceTest {
         assertThat(deletionSuccessful).isFalse();
     }
 
+    /**
+     * Tests {@link BoardService#createInitializedBoard()}
+     */
     @Test
-    public void createInitializedBoard() {
+    public void testCreateInitializedBoard() {
+        when(boardRepository.save(any(Board.class))).thenReturn(testBoard);
+
+        Board initializedBoard = boardService.createInitializedBoard();
+
+        assertThat(initializedBoard).isNotNull();
+        assertThat(initializedBoard.getStatus()).isEqualTo(RUNNING);
+        assertThat(initializedBoard.getPlayerTurn()).isEqualTo(FIRST_PLAYER);
+        assertThat(initializedBoard.getPits()).hasSize(COUNT_OF_ALL_PITS);
     }
 
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} with player 1 plays only once
+     */
     @Test
-    public void makeMove() {
+    public void testMakeMoveWithPlayerTurn() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // In case of pit 1, the last dropped stone won't be in the kalah, so the player turn is switched
+        Optional<Board> boardOptional = boardService.makeMove(BOARD_ID, PIT_1);
+
+        assertThat(boardOptional).isNotEmpty();
+        assertThat(boardOptional).hasValueSatisfying(
+                board -> {
+                    assertThat(board.getId()).isEqualTo(BOARD_ID);
+                    assertThat(board.getPlayerTurn()).isEqualTo(SECOND_PLAYER);
+                    assertThat(board.getPits().get(PIT_1).getStoneCount()).isEqualTo(0);
+                });
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} with player 1 plays once more (last stone is dropped into her own Kalah)
+     */
+    @Test
+    public void testMakeMoveWithPlayerPlaysAgain() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+        when(boardRepository.save(testBoard)).thenReturn(testBoard);
+
+        // In case of pit 1, the last dropped stone won't be in the kalah, so the player turn is switched
+        Optional<Board> boardOptional = boardService.makeMove(BOARD_ID, PIT_0);
+
+        assertThat(boardOptional).isNotEmpty();
+        assertThat(boardOptional).hasValueSatisfying(
+                board -> {
+                    assertThat(board.getId()).isEqualTo(BOARD_ID);
+                    assertThat(board.getPlayerTurn()).isEqualTo(FIRST_PLAYER);
+                    assertThat(board.getPits().get(PIT_0).getStoneCount()).isEqualTo(0);
+                    assertThat(board.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(1);
+                });
     }
 }
