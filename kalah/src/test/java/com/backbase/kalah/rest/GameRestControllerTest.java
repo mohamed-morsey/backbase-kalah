@@ -1,8 +1,10 @@
 package com.backbase.kalah.rest;
 
+import com.backbase.kalah.error.KalahGameExceptionHandler;
 import com.backbase.kalah.model.Board;
 import com.backbase.kalah.model.Game;
 import com.backbase.kalah.service.GameService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,8 +49,11 @@ public class GameRestControllerTest {
     //region field values
     private static final long GAME_ID = 1L;
     private static final int PIT_ID = 1;
-    private static final String GAME_URI = "http://example.org/games/1";
+    private static final String GAME_URI = "http://localhost/games/1";
     private static final String BASE_URI = "/" + GAMES_CONTEXT_PATH;
+
+    public static final String INVALID_GAME_ID = "game";
+    public static final String INVALID_PIT_ID = "pit";
     //endregion
 
     @Mock
@@ -69,12 +74,13 @@ public class GameRestControllerTest {
     @Before
     public void setUp() throws Exception {
         testBoard = new Board();
-        testGame = new Game(testBoard, BASE_URI);
+        testGame = new Game(testBoard, GAME_URI);
         testGame.setId(GAME_ID);
 
         builder = UriComponentsBuilder.fromUriString(BASE_URI);
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(gameRestController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(gameRestController)
+                .setControllerAdvice(new KalahGameExceptionHandler()).build();
     }
 
     /**
@@ -113,12 +119,79 @@ public class GameRestControllerTest {
      */
     @Test
     public void testMakeMove() throws Exception {
+        when(gameService.makeMove(GAME_ID, PIT_ID - 1)).thenReturn(Optional.of(testGame));
         URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(String.valueOf(GAME_ID), String.valueOf(PIT_ID)).toUri();
 
         this.mockMvc
                 .perform(put(uri))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests {@link GameRestController#makeMove(String, String)} for invalid game ID
+     * @throws Exception
+     */
+    @Test
+    public void testMakeMoveForInvalidGameId() throws Exception {
+        URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(INVALID_GAME_ID, String.valueOf(PIT_ID)).toUri();
+
+        this.mockMvc
+                .perform(put(uri))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Tests {@link GameRestController#makeMove(String, String)} for blank game ID
+     * @throws Exception
+     */
+    @Test
+    public void testMakeMoveForBlankGameId() throws Exception {
+        URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(StringUtils.SPACE, String.valueOf(PIT_ID)).toUri();
+
+        this.mockMvc
+                .perform(put(uri))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Tests {@link GameRestController#makeMove(String, String)} for invalid pit ID
+     * @throws Exception
+     */
+    @Test
+    public void testMakeMoveForInvalidPitId() throws Exception {
+        URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(GAME_ID, INVALID_PIT_ID).toUri();
+
+        this.mockMvc
+                .perform(put(uri))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Tests {@link GameRestController#makeMove(String, String)} for blank pit ID
+     * @throws Exception
+     */
+    @Test
+    public void testMakeMoveForBlankPitId() throws Exception {
+        URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(GAME_ID, StringUtils.SPACE).toUri();
+
+        this.mockMvc
+                .perform(put(uri))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Tests {@link GameRestController#makeMove(String, String)} for nonexistent game
+     * @throws Exception
+     */
+    @Test
+    public void testMakeMoveForNonexistentGame() throws Exception {
+        when(gameService.makeMove(GAME_ID, PIT_ID - 1)).thenReturn(Optional.empty());
+        URI uri = builder.path("/{id}/" + PITS_CONTEXT_PATH + "/{pitId}").buildAndExpand(String.valueOf(GAME_ID), String.valueOf(PIT_ID)).toUri();
+
+        this.mockMvc
+                .perform(put(uri))
+                .andExpect(status().isNotFound());
     }
 
     @Test
