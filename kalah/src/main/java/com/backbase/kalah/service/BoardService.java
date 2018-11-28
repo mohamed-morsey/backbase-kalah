@@ -330,12 +330,9 @@ public class BoardService implements CrudService<Board> {
         }
 
         // First player's pits are ranged between 7 and 12
-        if ((currentTurn == PLAYER_2) && (pitToCheck.getIndex() >= COUNT_OF_PLAYER_PITS)
-                && (pitToCheck.getIndex() < PLAYER_2_KALAH)) {
-            return true;
-        }
+        return (currentTurn == PLAYER_2) && (pitToCheck.getIndex() >= COUNT_OF_PLAYER_PITS)
+                && (pitToCheck.getIndex() < PLAYER_2_KALAH);
 
-        return false;
     }
 
     /**
@@ -352,11 +349,8 @@ public class BoardService implements CrudService<Board> {
         }
 
         // Second player's Kalah is index at 13
-        if ((currentTurn == PLAYER_2) && (pitToCheck.getIndex() == PLAYER_2_KALAH)) {
-            return true;
-        }
+        return (currentTurn == PLAYER_2) && (pitToCheck.getIndex() == PLAYER_2_KALAH);
 
-        return false;
     }
 
     /**
@@ -373,11 +367,8 @@ public class BoardService implements CrudService<Board> {
         }
 
         // If second player's Kalah then her opponent's Kalah is at index 6
-        if ((currentTurn == PLAYER_2) && (pitToCheck.getIndex() == PLAYER_1_KALAH)) {
-            return true;
-        }
+        return (currentTurn == PLAYER_2) && (pitToCheck.getIndex() == PLAYER_1_KALAH);
 
-        return false;
     }
 
     /**
@@ -388,8 +379,7 @@ public class BoardService implements CrudService<Board> {
      * @return The Kalah pit of the current
      */
     private Pit getMyKalah(Board board, PlayerTurn currentTurn) {
-        Pit playerKalah = (currentTurn == PLAYER_1) ? board.getPits().get(PLAYER_1_KALAH) : board.getPits().get(PLAYER_2_KALAH);
-        return playerKalah;
+        return (currentTurn == PLAYER_1) ? board.getPits().get(PLAYER_1_KALAH) : board.getPits().get(PLAYER_2_KALAH);
     }
 
     /**
@@ -450,10 +440,7 @@ public class BoardService implements CrudService<Board> {
         }
 
         // In case of first player the allowed pits are between 7 and 12
-        if ((board.getPlayerTurn() == PLAYER_2) && (pitId >= COUNT_OF_PLAYER_PITS && pitId < PLAYER_2_KALAH)) {
-            return true;
-        }
+        return (board.getPlayerTurn() == PLAYER_2) && (pitId >= COUNT_OF_PLAYER_PITS && pitId < PLAYER_2_KALAH);
 
-        return false;
     }
 }

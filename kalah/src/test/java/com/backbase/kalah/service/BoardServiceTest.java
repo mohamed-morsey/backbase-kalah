@@ -294,10 +294,25 @@ public class BoardServiceTest {
     }
 
     /**
-     * Tests {@link BoardService#makeMove(long, int)} but with incorrect player turn
+     * Tests {@link BoardService#makeMove(long, int)} but with not player1's turn
      */
     @Test
-    public void testMakeMoveWithNotPlayerTurn() {
+    public void testMakeMoveWithNotPlayer1Turn() {
+        thrownException.expect(KalahGameException.class);
+        thrownException.expectMessage(NOT_PLAYER_TURN_ERROR);
+
+        testBoard.setPlayerTurn(PLAYER_2);
+
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
+
+        boardService.makeMove(BOARD_ID, PIT_0);
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} but with not player2's turn
+     */
+    @Test
+    public void testMakeMoveWithNotPlayer2Turn() {
         thrownException.expect(KalahGameException.class);
         thrownException.expectMessage(NOT_PLAYER_TURN_ERROR);
 
