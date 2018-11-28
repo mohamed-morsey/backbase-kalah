@@ -214,7 +214,7 @@ public class BoardServiceTest {
         when(boardRepository.findOne(BOARD_ID)).thenReturn(testBoard);
         when(boardRepository.save(testBoard)).thenReturn(testBoard);
 
-        // In case of pit 1, the last dropped stone won't be in the kalah, so the player turn is switched
+        // In case of pit 0, the last dropped stone is in the kalah, so player1 plays again
         Optional<Board> boardOptional = boardService.makeMove(BOARD_ID, PIT_0);
 
         assertThat(boardOptional).isNotEmpty();
@@ -225,5 +225,17 @@ public class BoardServiceTest {
                     assertThat(board.getPits().get(PIT_0).getStoneCount()).isEqualTo(0);
                     assertThat(board.getPits().get(PLAYER_1_KALAH).getStoneCount()).isEqualTo(1);
                 });
+    }
+
+    /**
+     * Tests {@link BoardService#makeMove(long, int)} for nonexistent board
+     */
+    @Test
+    public void testMakeMoveForNonexistentBoard() {
+        when(boardRepository.findOne(BOARD_ID)).thenReturn(null);
+
+        Optional<Board> boardOptional = boardService.makeMove(BOARD_ID, PIT_0);
+
+        assertThat(boardOptional).isEmpty();
     }
 }
