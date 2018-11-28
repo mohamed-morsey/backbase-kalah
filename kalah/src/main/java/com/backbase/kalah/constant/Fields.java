@@ -13,6 +13,11 @@ public final class Fields {
     public static final String PIT_ID_PARAMETER = "pitId";
     // endregion
 
+    // region parameter names
+    public static final String ID_FIELD = "id";
+    // endregion
+
+
     private Fields() {
         // Private constructor to prevent instantiation
     }

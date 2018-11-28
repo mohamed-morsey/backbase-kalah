@@ -44,14 +44,15 @@ import static org.mockito.Mockito.when;
  **/
 @RunWith(MockitoJUnitRunner.class)
 public class BoardServiceTest {
-    public static final int INVALID_PIT_ID = 20;
     //region field values
+    private static final int INVALID_PIT_ID = 20;
     private static final long BOARD_ID = 1L;
     private static final int PIT_0 = 0;
     private static final int PIT_1 = 1;
     private static final int PIT_5 = 5;
     private static final int PIT_10 = 10;
     //endregion
+
     @Rule
     public ExpectedException thrownException = ExpectedException.none();
 

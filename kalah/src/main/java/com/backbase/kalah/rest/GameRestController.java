@@ -52,8 +52,7 @@ public class GameRestController {
         this.logger = logger;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDto> createGame() {
         String baseUri = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
         Optional<Game> gameOptional = gameService.createNewGame(baseUri);
@@ -72,7 +71,6 @@ public class GameRestController {
     }
 
     @PutMapping(path = "/{id}/" + PITS_CONTEXT_PATH + "/{pitId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity makeMove(@PathVariable(ID_PARAMETER) final String id,
                                    @PathVariable(PIT_ID_PARAMETER) final String pitId) {
