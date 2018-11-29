@@ -42,8 +42,8 @@ and *"GameStatusDto"* are created.
 4. **Database**: H2 database is used in embedded mode to provide data storage. 
 5. **Exception Handling**: The application defines an exception handler, called *"KalahGameExceptionHandler*", 
 which catches the exceptions thrown and returns the appropriate HTTP status code along with an error message.
-7. **Testing**: Unit and integration tests are used to cover the various application features.
-8. **Code Quality**: The code quality is inspected and checked with [SonarQube](https://sonarcloud.io/about/sq).
+6. **Testing**: Unit and integration tests are used to cover the various application features.
+7. **Code Quality**: The code quality is inspected and checked with [SonarQube](https://sonarcloud.io/about/sq).
 
 ## Design Objectives
 The main objectives of this design are:
