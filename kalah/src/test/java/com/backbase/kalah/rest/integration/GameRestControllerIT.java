@@ -8,11 +8,8 @@ import com.backbase.kalah.repository.BoardRepository;
 import com.backbase.kalah.repository.GameRepository;
 import com.backbase.kalah.repository.PitRepository;
 import com.backbase.kalah.rest.GameRestController;
-import com.backbase.kalah.service.BoardService;
-import com.backbase.kalah.service.GameService;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -130,8 +127,8 @@ public class GameRestControllerIT {
         assertThat(gamePlayResult.getStatusCode().value()).isEqualTo(HttpServletResponse.SC_OK);
 
         // Get scores of both players
-        String player1Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_1_KALAH + 1));
-        String player2Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
+        String player1Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_1_KALAH + 1));
+        String player2Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
 
         assertThat(Integer.parseInt(player1Score)).isGreaterThan(Integer.parseInt(player2Score));
     }
@@ -182,8 +179,8 @@ public class GameRestControllerIT {
         assertThat(gamePlayResult.getStatusCode().value()).isEqualTo(HttpServletResponse.SC_OK);
 
         // Get scores of both players
-        String player1Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_1_KALAH + 1));
-        String player2Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
+        String player1Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_1_KALAH + 1));
+        String player2Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
 
         assertThat(Integer.parseInt(player1Score)).isLessThan(Integer.parseInt(player2Score));
     }
