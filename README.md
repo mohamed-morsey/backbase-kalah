@@ -43,6 +43,7 @@ and *"GameStatusDto"* are created.
 5. **Exception Handling**: The application defines an exception handler, called *"KalahGameExceptionHandler*", 
 which catches the exceptions thrown and returns the appropriate HTTP status code along with an error message.
 6. **Testing**: Unit and integration tests are used to cover the various application features.
+Two full integration tests, each one covers the case of a different player wins the game.
 7. **Code Quality**: The code quality is inspected and checked with [SonarQube](https://sonarcloud.io/about/sq).
 
 ## Design Objectives
