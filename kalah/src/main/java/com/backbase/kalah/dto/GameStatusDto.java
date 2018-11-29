@@ -11,25 +11,25 @@ import java.util.Map;
  * Date: 2018-11-25
  **/
 public class GameStatusDto {
-    private long id;
+    private String id;
     private String url;
     private Map<String, String> status;
 
     public GameStatusDto() {
-        id = 0L;
+        id = "0";
     }
 
-    public GameStatusDto(long id, String url, Map<String, String> status) {
+    public GameStatusDto(String id, String url, Map<String, String> status) {
         this.id = id;
         this.url = url;
         this.status = status;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

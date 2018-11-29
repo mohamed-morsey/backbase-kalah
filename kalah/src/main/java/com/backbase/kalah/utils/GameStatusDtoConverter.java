@@ -26,6 +26,6 @@ public class GameStatusDtoConverter {
             boardStatus.put(String.valueOf(pit.getIndex() + 1), String.valueOf(pit.getStoneCount()));
         }
 
-        return new GameStatusDto(game.getId(), game.getUri(), boardStatus);
+        return new GameStatusDto(String.valueOf(game.getId()), game.getUri(), boardStatus);
     }
 }

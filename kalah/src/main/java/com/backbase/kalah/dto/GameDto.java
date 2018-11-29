@@ -10,24 +10,24 @@ import org.apache.commons.lang3.StringUtils;
  * Date: 2018-11-25
  **/
 public class GameDto {
-    private long id;
+    private String id;
     private String uri;
 
     public GameDto() {
-        this.id = 0L;
+        this.id = "0";
         this.uri = StringUtils.EMPTY;
     }
 
-    public GameDto(long id, String uri) {
+    public GameDto(String id, String uri) {
         this.id = id;
         this.uri = uri;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
