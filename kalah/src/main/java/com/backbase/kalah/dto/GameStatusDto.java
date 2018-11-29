@@ -12,16 +12,16 @@ import java.util.Map;
  **/
 public class GameStatusDto {
     private long id;
-    private String uri;
+    private String url;
     private Map<String, String> status;
 
     public GameStatusDto() {
         id = 0L;
     }
 
-    public GameStatusDto(long id, String uri, Map<String, String> status) {
+    public GameStatusDto(long id, String url, Map<String, String> status) {
         this.id = id;
-        this.uri = uri;
+        this.url = url;
         this.status = status;
     }
 
@@ -33,12 +33,12 @@ public class GameStatusDto {
         this.id = id;
     }
 
-    public String getUri() {
-        return uri;
+    public String getUrl() {
+        return url;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setUri(String url) {
+        this.url = url;
     }
 
     public Map<String, String> getStatus() {
@@ -53,7 +53,7 @@ public class GameStatusDto {
     public String toString() {
         return "GameStatusDto{" +
                 "id=" + id +
-                ", uri='" + uri + '\'' +
+                ", url='" + url + '\'' +
                 ", status=" + status +
                 '}';
     }

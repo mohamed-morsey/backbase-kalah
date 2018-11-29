@@ -25,10 +25,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.backbase.kalah.constant.Fields.PIT_ID_PARAMETER;
 import static com.backbase.kalah.constant.Paths.GAMES_CONTEXT_PATH;
 import static com.backbase.kalah.constant.Paths.PITS_CONTEXT_PATH;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Integration test class for {@link GameRestController}
@@ -46,8 +52,9 @@ public class GameRestControllerIT {
     private static final ParameterizedTypeReference<GameStatusDto> GAME_STATUS_DTO_RESPONSE_TYPE =
             new ParameterizedTypeReference<GameStatusDto>() {};
 
-    //region field values
-    private static final long GAME_ID = 1L;
+    //region constants
+    private static final String PLAYER1_WINNING_SEQUENCE_FILENAME = "player1-winning-sequence";
+    private static final String PLAYER2_WINNING_SEQUENCE_FILENAME = "player2-winning-sequence";
     //endregion
 
     @Inject
@@ -102,9 +109,11 @@ public class GameRestControllerIT {
      */
     @Test
     public void testCreateAndPlayGameWithPlayer1Wins() throws Exception {
-        // 1- Get the number of customers, accounts and transactions before adding any -> all should be 0
+        String player1WinningSequence = IOUtils.toString(
+                this.getClass().getResourceAsStream(PLAYER1_WINNING_SEQUENCE_FILENAME), UTF_8);
+        String[] playSequence = player1WinningSequence.split("\n");
 
-        // Prepare the correct URI to contact the customer controller
+        // Prepare the correct URI to contact the game REST controller and create the game
         builder = UriComponentsBuilder.fromUriString("/" + GAMES_CONTEXT_PATH);
         String uri = builder.toUriString();
 
@@ -118,13 +127,20 @@ public class GameRestControllerIT {
                 restTemplate.exchange(uri, POST, HttpEntity.EMPTY, GAME_DTO_RESPONSE_TYPE);
         String gameUri = gameCreationResult.getBody().getUri();
 
-        builder = UriComponentsBuilder.fromUriString(gameUri + "/" + PITS_CONTEXT_PATH + "/" + "1");
-        uri = builder.build().toUriString();
 
-        ResponseEntity<GameStatusDto> gamePlayResult =
-                restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, GAME_STATUS_DTO_RESPONSE_TYPE);
+        String uriTemplate = gameUri + "/" + PITS_CONTEXT_PATH + "/{pitId}";
+        Map<String, String> uriParams = new HashMap<>();
+        builder = UriComponentsBuilder.fromUriString(uriTemplate);
 
-        System.out.println(gamePlayResult.getBody());
+        for (String pitPath:playSequence) {
+            uriParams.put(PIT_ID_PARAMETER, pitPath);
+            uri = builder.buildAndExpand(uriParams).toUriString();
+
+            ResponseEntity<GameStatusDto> gamePlayResult =
+                    restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, GAME_STATUS_DTO_RESPONSE_TYPE);
+
+            System.out.println(gamePlayResult.getBody());
+        }
 
     }
 }
