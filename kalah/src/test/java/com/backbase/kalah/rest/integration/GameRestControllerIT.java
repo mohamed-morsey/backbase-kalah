@@ -69,13 +69,7 @@ public class GameRestControllerIT {
     @Inject
     private GameRepository gameRepository;
     @Inject
-    private BoardService boardService;
-    @Inject
-    private GameService gameService;
-    @Inject
     private TestRestTemplate restTemplate;
-    @Inject
-    private GameRestController gameRestController;
 
     private Game testGame;
     private Board testBoard;
@@ -191,6 +185,6 @@ public class GameRestControllerIT {
         String player1Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_1_KALAH + 1));
         String player2Score  = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
 
-        assertThat(Integer.parseInt(player2Score)).isGreaterThan(Integer.parseInt(player1Score));
+        assertThat(Integer.parseInt(player1Score)).isLessThan(Integer.parseInt(player2Score));
     }
 }
