@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -73,7 +72,7 @@ public class GameRestController {
     @PutMapping(path = "/{id}/" + PITS_CONTEXT_PATH + "/{pitId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameStatusDto> makeMove(@PathVariable(ID_PARAMETER) final String id,
-                                   @PathVariable(PIT_ID_PARAMETER) final String pitId) {
+                                                  @PathVariable(PIT_ID_PARAMETER) final String pitId) {
         // Check if a valid game ID is passed
         if ((StringUtils.isBlank(id)) || (!StringUtils.isNumeric(id))) {
             logger.warn(INVALID_ID_ERROR);
@@ -102,30 +101,4 @@ public class GameRestController {
 
         return ResponseEntity.ok().body(dto);
     }
-
-    @GetMapping(path = "/{id}/",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getGameScore(@PathVariable(ID_PARAMETER) final String id) {
-        // Check if a valid game ID is passed
-        if ((StringUtils.isBlank(id)) || (!StringUtils.isNumeric(id))) {
-            logger.warn(INVALID_ID_ERROR);
-            throw new IllegalArgumentException(INVALID_ID_ERROR);
-        }
-
-        long idLong = Long.parseLong(id);
-
-        // pitId - 1 as it should be zero based but in the interface is it's one based
-        Optional<Game> gameOptional = gameService.get(idLong);
-
-        // In case the game is not found in the system gameOptional will be Optional#EMPTY
-        if (!gameOptional.isPresent()) {
-            logger.warn(GAME_NOT_FOUND_ERROR);
-            return ResponseEntity.notFound().build();
-        }
-
-        GameStatusDto dto = GameStatusDtoConverter.toGameStatusDto(gameOptional.get());
-        return ResponseEntity.ok().body(dto);
-    }
-
 }
