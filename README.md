@@ -24,14 +24,6 @@ The application has been tested on:
 1. Ubuntu 16.04 LTS.
 2. Windows 7 Ultimate.
 
-## Supported Browsers
-The application has been tested on:
-
-1. Mozilla Firefox.
-2. Google Chrome.
-3. Opera.
-4. Microsoft Internet Explorer.
-
 ## Design and Implementation Details
 The application is a web based application developed based on Spring Boot framework.
 Currently, the application supports managing game entities.
