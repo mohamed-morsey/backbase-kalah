@@ -4,7 +4,7 @@ package com.backbase.kalah.constant;
  * Container for success and error messages
  *
  * @author Mohamed Morsey
- * Date: 2018-10-05
+ * Date: 2018-11-26
  **/
 public final class Messages {
 

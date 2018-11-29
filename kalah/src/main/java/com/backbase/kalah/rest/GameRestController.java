@@ -36,7 +36,7 @@ import static com.backbase.kalah.constant.Paths.PITS_CONTEXT_PATH;
  * Controller for {@link Game}s
  *
  * @author Mohamed Morsey
- * Date: 2018-10-05
+ * Date: 2018-11-26
  **/
 @RestController
 @RequestMapping("/" + GAMES_CONTEXT_PATH)
@@ -72,7 +72,7 @@ public class GameRestController {
 
     @PutMapping(path = "/{id}/" + PITS_CONTEXT_PATH + "/{pitId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity makeMove(@PathVariable(ID_PARAMETER) final String id,
+    public ResponseEntity<GameStatusDto> makeMove(@PathVariable(ID_PARAMETER) final String id,
                                    @PathVariable(PIT_ID_PARAMETER) final String pitId) {
         // Check if a valid game ID is passed
         if ((StringUtils.isBlank(id)) || (!StringUtils.isNumeric(id))) {

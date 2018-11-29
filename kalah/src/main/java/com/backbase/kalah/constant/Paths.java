@@ -4,7 +4,7 @@ package com.backbase.kalah.constant;
  * Container REST paths
  *
  * @author Mohamed Morsey
- * Date: 2018-10-07
+ * Date: 2018-11-26
  **/
 public final class Paths {
     public static final String GAMES_CONTEXT_PATH = "games";

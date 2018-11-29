@@ -19,13 +19,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.backbase.kalah.constant.Fields.ID_FIELD;
-import static com.backbase.kalah.constant.Fields.ID_PARAMETER;
-import static com.backbase.kalah.constant.Fields.PIT_ID_PARAMETER;
 import static com.backbase.kalah.constant.Messages.GAME_CREATION_FAILED_ERROR;
 import static com.backbase.kalah.constant.Paths.GAMES_CONTEXT_PATH;
 import static com.backbase.kalah.constant.Paths.PITS_CONTEXT_PATH;
@@ -47,13 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(MockitoJUnitRunner.class)
 public class GameRestControllerTest {
     //region field values
+    private static final String INVALID_GAME_ID = "game";
+    private static final String INVALID_PIT_ID = "pit";
     private static final long GAME_ID = 1L;
     private static final int PIT_ID = 1;
     private static final String GAME_URI = "http://localhost/games/1";
     private static final String BASE_URI = "/" + GAMES_CONTEXT_PATH;
-
-    public static final String INVALID_GAME_ID = "game";
-    public static final String INVALID_PIT_ID = "pit";
     //endregion
 
     @Mock
@@ -65,7 +60,6 @@ public class GameRestControllerTest {
     private GameRestController gameRestController;
 
     private MockMvc mockMvc;
-    private ModelMapper mapper = new ModelMapper(); // Mapper for converting between entities and DTOs
     private UriComponentsBuilder builder;
 
     private Game testGame;
@@ -85,6 +79,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#createGame()}
+     *
      * @throws Exception
      */
     @Test
@@ -100,6 +95,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#createGame()} with creation failure
+     *
      * @throws Exception
      */
     @Test
@@ -115,6 +111,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)}
+     *
      * @throws Exception
      */
     @Test
@@ -130,6 +127,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)} for invalid game ID
+     *
      * @throws Exception
      */
     @Test
@@ -143,6 +141,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)} for blank game ID
+     *
      * @throws Exception
      */
     @Test
@@ -156,6 +155,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)} for invalid pit ID
+     *
      * @throws Exception
      */
     @Test
@@ -169,6 +169,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)} for blank pit ID
+     *
      * @throws Exception
      */
     @Test
@@ -182,6 +183,7 @@ public class GameRestControllerTest {
 
     /**
      * Tests {@link GameRestController#makeMove(String, String)} for nonexistent game
+     *
      * @throws Exception
      */
     @Test

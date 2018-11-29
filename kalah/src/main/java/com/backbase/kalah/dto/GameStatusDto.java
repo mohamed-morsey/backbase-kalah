@@ -15,6 +15,10 @@ public class GameStatusDto {
     private String uri;
     private Map<String, String> status;
 
+    public GameStatusDto() {
+        id = 0L;
+    }
+
     public GameStatusDto(long id, String uri, Map<String, String> status) {
         this.id = id;
         this.uri = uri;

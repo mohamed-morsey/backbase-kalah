@@ -47,7 +47,7 @@ public class Game {
         this.id = id;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     public Board getBoard() {
         return board;
     }

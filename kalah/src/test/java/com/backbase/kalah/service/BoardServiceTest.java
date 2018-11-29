@@ -364,7 +364,7 @@ public class BoardServiceTest {
         when(boardRepository.save(testBoard)).thenReturn(testBoard);
 
         // In order to let the game finish quickly, we set all pits of one player to zero except one
-        for(int i = 0; i < PLAYER_1_KALAH; i++){
+        for (int i = 0; i < PLAYER_1_KALAH; i++) {
             testBoard.getPits().get(i).setStoneCount(0);
         }
         testBoard.getPits().get(PIT_0).setStoneCount(1);
@@ -390,7 +390,7 @@ public class BoardServiceTest {
         when(boardRepository.save(testBoard)).thenReturn(testBoard);
 
         // In order to let the game finish quickly, we set all pits of one player to zero except one
-        for(int i = PLAYER_1_KALAH + 1; i < PLAYER_2_KALAH; i++){
+        for (int i = PLAYER_1_KALAH + 1; i < PLAYER_2_KALAH; i++) {
             testBoard.getPits().get(i).setStoneCount(0);
         }
         testBoard.getPits().get(PIT_10).setStoneCount(1);
@@ -417,7 +417,7 @@ public class BoardServiceTest {
         when(boardRepository.save(testBoard)).thenReturn(testBoard);
 
         // In order to let the game finish quickly, we set stones of all pits to 0
-        for(int i = 0; i < PLAYER_2_KALAH; i++){
+        for (int i = 0; i < PLAYER_2_KALAH; i++) {
             testBoard.getPits().get(i).setStoneCount(0);
         }
         // Set the pit5 to 1, in order to have an available move

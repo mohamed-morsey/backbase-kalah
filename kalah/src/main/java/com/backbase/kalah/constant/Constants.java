@@ -4,7 +4,7 @@ package com.backbase.kalah.constant;
  * Container for column, field and parameter names
  *
  * @author Mohamed Morsey
- * Date: 2018-10-05
+ * Date: 2018-11-25
  **/
 public final class Constants {
 
