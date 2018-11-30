@@ -22,7 +22,16 @@ The application starts and it is available at **"http://localhost:8080/games"**.
 The application has been tested on:
 
 1. Ubuntu 16.04 LTS.
-2. Windows 7 Ultimate.
+2. Windows 10.
+
+## General System Architecture
+The system adheres to the layered architecture. Each layer has a specific task to achieve. 
+The system consists of the following layers:
+1. Database layer: H2 database is used in embedded mode for data storage.
+2. Repository layer: constitutes the data access layer which enables sending/retrieving data from database.
+3. Service layer: is the business layer in which the entire game (business) logic is performed.
+4. API layer: is the REST layer the provides access to whole system functionality.
+ 
 
 ## Design and Implementation Details
 The application is a web based application developed based on Spring Boot framework.
