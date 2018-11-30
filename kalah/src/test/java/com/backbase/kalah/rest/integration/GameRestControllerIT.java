@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,6 +20,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
@@ -53,10 +56,14 @@ public class GameRestControllerIT {
     private static final ParameterizedTypeReference<GameStatusDto> GAME_STATUS_DTO_RESPONSE_TYPE =
             new ParameterizedTypeReference<GameStatusDto>() {
             };
+    private static final ParameterizedTypeReference<DefaultErrorAttributes> DEFAULT_ERROR_ATTRIBUTES_RESPONSE_TYPE =
+            new ParameterizedTypeReference<DefaultErrorAttributes>() {
+            };
 
     //region constants
     private static final String PLAYER1_WINNING_SEQUENCE_FILENAME = "player1-winning-sequence";
     private static final String PLAYER2_WINNING_SEQUENCE_FILENAME = "player2-winning-sequence";
+    private static final String PIT_1_ID = "1";
     //endregion
 
     @Inject
@@ -115,8 +122,8 @@ public class GameRestControllerIT {
         builder = UriComponentsBuilder.fromUriString(uriTemplate);
         ResponseEntity<GameStatusDto> gamePlayResult = null;
 
-        for (String pitPath : playSequence) {
-            uriParams.put(PIT_ID_PARAMETER, pitPath);
+        for (String currentPitIndex : playSequence) {
+            uriParams.put(PIT_ID_PARAMETER, currentPitIndex);
             uri = builder.buildAndExpand(uriParams).toUriString();
 
             gamePlayResult = restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, GAME_STATUS_DTO_RESPONSE_TYPE);
@@ -131,6 +138,15 @@ public class GameRestControllerIT {
         String player2Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
 
         assertThat(Integer.parseInt(player1Score)).isGreaterThan(Integer.parseInt(player2Score));
+
+        // Now, the game has ended, if we try to do any other move, we should get an error, stating that the game is finished
+        uriParams.put(PIT_ID_PARAMETER, PIT_1_ID);
+        uri = builder.buildAndExpand(uriParams).toUriString();
+
+        ResponseEntity<DefaultErrorAttributes> gameErrorResult = restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, DEFAULT_ERROR_ATTRIBUTES_RESPONSE_TYPE);
+
+        assertThat(gameErrorResult).isNotNull();
+        assertThat(gameErrorResult.getStatusCode().value()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -167,8 +183,8 @@ public class GameRestControllerIT {
         builder = UriComponentsBuilder.fromUriString(uriTemplate);
         ResponseEntity<GameStatusDto> gamePlayResult = null;
 
-        for (String pitPath : playSequence) {
-            uriParams.put(PIT_ID_PARAMETER, pitPath);
+        for (String currentPitIndex : playSequence) {
+            uriParams.put(PIT_ID_PARAMETER, currentPitIndex);
             uri = builder.buildAndExpand(uriParams).toUriString();
 
             gamePlayResult = restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, GAME_STATUS_DTO_RESPONSE_TYPE);
@@ -183,5 +199,14 @@ public class GameRestControllerIT {
         String player2Score = gamePlayResult.getBody().getStatus().get(String.valueOf(PLAYER_2_KALAH + 1));
 
         assertThat(Integer.parseInt(player1Score)).isLessThan(Integer.parseInt(player2Score));
+
+        // Now, the game has ended, if we try to do any other move, we should get an error
+        uriParams.put(PIT_ID_PARAMETER, PIT_1_ID);
+        uri = builder.buildAndExpand(uriParams).toUriString();
+
+        ResponseEntity<DefaultErrorAttributes> gameErrorResult = restTemplate.exchange(uri, PUT, HttpEntity.EMPTY, DEFAULT_ERROR_ATTRIBUTES_RESPONSE_TYPE);
+
+        assertThat(gameErrorResult).isNotNull();
+        assertThat(gameErrorResult.getStatusCode().value()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 }
